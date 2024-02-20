@@ -5,7 +5,7 @@ from typing import NamedTuple
 from requests import Response
 from requests_html import AsyncHTMLSession
 
-from .config import HEADERS, PER_PAGE, URL, DATA_FILE
+from .config import DATA_FILE, HEADERS, PER_PAGE, URL
 
 
 class Product(NamedTuple):

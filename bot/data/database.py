@@ -1,10 +1,14 @@
 import sqlite3 as sq
-
-with sq.connect('bot/data/bot_database.db') as db:
-    cur = db.cursor()
+from collections import namedtuple
 
 
-async def create_tables():
+def namedtuple_factory(cursor, row):
+    fields = [column[0] for column in cursor.description]
+    cls = namedtuple("Row", fields)
+    return cls._make(row)
+
+
+def create_tables():
     cur.executescript("""
     CREATE TABLE IF NOT EXISTS user (
         id integer PRIMARY KEY AUTOINCREMENT,
@@ -16,7 +20,7 @@ async def create_tables():
         title varchar(255) NOT NULL,
         url varchar UNIQUE,
         last_price real NOT NULL,
-        with_card_price real NULL
+        price_with_card real NULL
     );
     CREATE TABLE IF NOT EXISTS user_product (
         user_id integer REFERENCES user(id),
@@ -27,47 +31,42 @@ async def create_tables():
     db.commit()
 
 
-async def add_user(tg_id):
+def add_user(tg_id):
     cur.execute("INSERT OR IGNORE INTO user (tg_id) VALUES (?)", (tg_id,))
     db.commit()
     return cur.lastrowid
 
 
-async def get_user(tg_id):
+def get_user(tg_id):
     return cur.execute("SELECT * FROM user WHERE tg_id = ?", (tg_id,)).fetchone()
 
 
-async def delete_user(tg_id):
-    cur.execute("DELETE FROM user WHERE tg_id = ?", (tg_id,))
-    db.commit()
-
-
-async def get_product_users(product_id):
+def get_product_users(product_id):
     cur.execute("""SELECT * FROM user 
     INNER JOIN user_product ON user.id = user_product.user_id 
     WHERE user_product.product_id = ?""", (product_id,))
     return cur.fetchall()
 
 
-async def get_product(url):
+def get_product(url):
     return cur.execute("SELECT * FROM product WHERE url = ?", (url,)).fetchone()
 
 
-async def create_product(*, title: str, url: str, price: float, price_with_card: float):
+def create_product(*, title: str, url: str, price: float, price_with_card: float):
     cur.execute(
-        "INSERT INTO product(title, url, last_price, with_card_price) VALUES (?, ?, ?, ?)",
+        "INSERT INTO product(title, url, last_price, price_with_card) VALUES (?, ?, ?, ?)",
         (title, url, price, price_with_card)
     )
     db.commit()
     return cur.lastrowid
 
 
-async def add_to_wishlist(user_id, product_id):
-    cur.execute("INSERT INTO user_product (user_id, product_id) VALUES (?, ?)", (user_id, product_id))
+def add_to_wishlist(user_id, product_id):
+    cur.execute("INSERT OR IGNORE INTO user_product (user_id, product_id) VALUES (?, ?)", (user_id, product_id))
     db.commit()
 
 
-async def get_user_wishlist(tg_id):
+def get_user_wishlist(tg_id):
     user = cur.execute("SELECT id FROM user WHERE tg_id = ?", (tg_id,)).fetchone()
     cur.execute("""SELECT product.* FROM product 
     INNER JOIN user_product ON product.id = user_product.product_id
@@ -75,26 +74,25 @@ async def get_user_wishlist(tg_id):
     return cur.fetchall()
 
 
-async def remove_from_wishlist(product_id):
-    cur.execute("DELETE FROM user_product WHERE product_id = ?", (product_id,))
-    await delete_unused_products()
+def remove_from_wishlist(user_id, product_id):
+    cur.execute("DELETE FROM user_product WHERE user_id = ? AND product_id = ?", (user_id, product_id))
     db.commit()
 
 
-async def delete_unused_products():
+def delete_unused_products():
     cur.execute("DELETE FROM product WHERE id NOT IN (SELECT product_id FROM user_product)")
     db.commit()
 
 
-async def get_all_products():
-    return cur.execute("SELECT * FROM product ORDER BY url").fetchall()
+def get_all_products():
+    return cur.execute("SELECT * FROM product ORDER BY url") .fetchall()
 
 
-async def update_card_price(product_id, new_price):
-    cur.execute("UPDATE product SET with_card_price = ? WHERE id = ?", (new_price, product_id))
+def update_price(product_id: int, column_name: str, new_price: float):
+    cur.execute(f"UPDATE product SET {column_name} = ? WHERE id = ?", (new_price, product_id))
     db.commit()
 
 
-async def update_price(product_id, new_price):
-    cur.execute("UPDATE product SET last_price = ? WHERE id = ?", (new_price, product_id))
-    db.commit()
+with sq.connect('bot/data/bot_database.db') as db:
+    db.row_factory = namedtuple_factory
+    cur = db.cursor()

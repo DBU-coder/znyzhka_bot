@@ -15,7 +15,7 @@ bot = Bot(token=os.getenv('BOT_TOKEN'), parse_mode='HTML')
 
 
 async def on_startup():
-    await db.create_tables()
+    db.create_tables()
     logging.info('DB connected successfully.')
     asyncio.create_task(check_price(bot))
 

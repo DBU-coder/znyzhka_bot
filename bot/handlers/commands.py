@@ -15,7 +15,7 @@ router = Router(name=__name__)
 
 @router.message(CommandStart())
 async def cmd_start(message: types.Message):
-    await db.add_user(message.from_user.id)
+    db.add_user(message.from_user.id)
     first_name = message.from_user.first_name
     msg = f'Вітаю, {first_name}! 👋\nВиберіть торгівельну мережу.'
 
@@ -31,7 +31,7 @@ async def cmd_add_wishlist(message: types.Message):
 @router.message(Command('wishlist'))
 @router.message(F.text.lower() == 'обрані товари')
 async def cmd_wishlist(message: types.Message):
-    wishlist = await db.get_user_wishlist(message.from_user.id)
+    wishlist = db.get_user_wishlist(message.from_user.id)
     if wishlist:
         for product_data in wishlist:
             product = Product(*product_data)

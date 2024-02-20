@@ -9,6 +9,7 @@ from aiogram.utils.markdown import hbold, hide_link, hlink, hstrikethrough
 
 from bot.data import database as db
 from bot.filters import UrlFilter
+from bot.keyboards import get_add_to_wishlist_ikb
 from bot.utils.func import get_category_products, is_datafile_updated
 from parsers.atb_parser import config
 from parsers.atb_parser import parser as atb_parser
@@ -46,8 +47,8 @@ async def category_products(message: types.Message, index: Match[str]):
             with_card_price = product.get('with_card')
             if with_card_price:
                 card += f"З картою АТБ 💳: {hbold(with_card_price, 'грн.')}"
-            await message.answer(card)
-            await sleep(1.5)
+            await message.answer(card, reply_markup=get_add_to_wishlist_ikb(product['link']))
+            await sleep(1.2)
     except IndexError:
         msg = '''
 Нажаль категорії під цим номером не існує.😢
@@ -60,18 +61,18 @@ async def category_products(message: types.Message, index: Match[str]):
 @router.message(UrlFilter(store_url='www.atbmarket'))
 async def add_to_wishlist(message: types.Message):
     url = message.text
-    product_data = await db.get_product(url)
+    product_data = db.get_product(url)
     if not product_data:
         product = await atb_parser.collect_fav_products_info(url=url)
-        product_id = await db.create_product(title=product.title,
+        product_id = db.create_product(title=product.title,
                                              url=product.url,
                                              price=product.price,
                                              price_with_card=product.price_with_card)
     else:
         product_id = product_data[0]
-    user = await db.get_user(message.from_user.id)
+    user = db.get_user(message.from_user.id)
     try:
-        await db.add_to_wishlist(user[0], product_id)
+        db.add_to_wishlist(user[0], product_id)
     except sqlite3.IntegrityError:
         await message.reply('Ви вже слідкуєте за цим товаром.')
     else:

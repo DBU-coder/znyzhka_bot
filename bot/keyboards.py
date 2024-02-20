@@ -3,6 +3,7 @@ from aiogram.types import (InlineKeyboardMarkup, KeyboardButton,
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
 from bot.handlers.callbacks import WishlistCallback
+from bot.utils.func import get_slug
 
 
 def get_choice_store_kb(**kwargs) -> ReplyKeyboardMarkup:
@@ -20,4 +21,10 @@ def get_choice_store_kb(**kwargs) -> ReplyKeyboardMarkup:
 def get_delete_from_wishlist_ikb(product_id: int) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.button(text='Видалити з Обраного', callback_data=WishlistCallback(product_id=product_id, action='delete'))
+    return builder.as_markup()
+
+
+def get_add_to_wishlist_ikb(link: str):
+    builder = InlineKeyboardBuilder()
+    builder.button(text='Додати до Обраного', callback_data=WishlistCallback(slug=get_slug(link), action='add'))
     return builder.as_markup()

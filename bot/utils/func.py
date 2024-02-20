@@ -36,38 +36,44 @@ def get_category_products(data, cat_index):
         yield product
 
 
-async def notify_price_change(bot, old_data, new_price):
-    users = await db.get_product_users(old_data[0])
-    message = (f'‼️Ціна на товар: <b>{hlink(old_data[1], old_data[2])}</b> змінилась‼️\n'
-               f'Стара: {hstrikethrough(old_data[3], "грн.")} Нова: {hbold(new_price, "грн.")}')
+def get_slug(link: str) -> str:
+    slug = link.split('/')[-1]
+    return slug
+
+
+async def notify_price_change(bot, product, new_price):
+    users = await db.get_product_users(product.id)
+    message = (f'‼️Ціна на товар: <b>{hlink(product.title, product.url)}</b> змінилась‼️\n'
+               f'Стара: {hstrikethrough(product.last_price, "грн.")} Нова: {hbold(new_price, "грн.")}')
     await send_notifications(bot, users, message)
 
 
-async def notify_card_price_change(bot, old_data, new_price_with_card):
-    users = await db.get_product_users(old_data[0])
-    message = (f'‼️Ціна на товар: <b>{hlink(old_data[1], old_data[2])}</b> при оплаті картою АТБ змінилась‼️\n'
-               f'Стара💳: {hstrikethrough(old_data[4], "грн.")} Нова💳: {hbold(new_price_with_card, "грн.")}')
+async def notify_card_price_change(bot, product, new_price_with_card):
+    users = db.get_product_users(product.id)
+    message = (f'‼️Ціна на товар: <b>{hlink(product.title, product.url)}</b> при оплаті картою АТБ змінилась‼️\n'
+               f'Стара💳: {hstrikethrough(product.price_with_card, "грн.")} Нова💳: {hbold(new_price_with_card, "грн.")}')
     await send_notifications(bot, users, message)
 
 
 async def send_notifications(bot, users, message):
     for user in users:
-        await bot.send_message(chat_id=user[1], text=message)
+        await bot.send_message(chat_id=user.tg_id, text=message)
 
 
 async def check_price(bot):
     while True:
-        old_products_data = await db.get_all_products()
-        links = [product[2] for product in old_products_data]
-        new_products_data = await collect_price(links)
-        new_products_data.sort(key=lambda x: x.url)
+        db.delete_unused_products()
+        old_products = db.get_all_products()
+        links = [product.url for product in old_products]
+        new_products = await collect_price(links)
+        new_products.sort(key=lambda x: x.url)
 
-        for old_data, new_data in zip(old_products_data, new_products_data):
-            old_price_with_card = old_data[4]
-            if old_data[3] != new_data.price:
-                await notify_price_change(bot, old_data, new_data.price)
-                await db.update_price(product_id=old_data[0], new_price=new_data.price)
-            if old_price_with_card != new_data.price_with_card:
-                await notify_card_price_change(bot, old_data, new_data.price_with_card)
-                await db.update_card_price(product_id=old_data[0], new_price=new_data.price_with_card)
+        for old_product, new_product in zip(old_products, new_products):
+            if old_product.last_price != new_product.price:
+                await notify_price_change(bot, old_product, new_product.price)
+                db.update_price(product_id=old_product.id, column_name='last_price', new_price=new_product.price)
+            if old_product.price_with_card != new_product.price_with_card:
+                await notify_card_price_change(bot, old_product, new_product.price_with_card)
+                db.update_price(product_id=old_product.id, column_name='price_with_card',
+                                new_price=new_product.price_with_card)
         await asyncio.sleep(3600)
