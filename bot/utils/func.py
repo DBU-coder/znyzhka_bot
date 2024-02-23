@@ -5,7 +5,7 @@ from datetime import datetime
 from aiogram.utils.markdown import hbold, hlink, hstrikethrough
 
 import bot.data.database as db
-from parsers.atb_parser.parser import collect_price
+from parser.atb_parser.parser import collect_price
 
 
 def is_datafile_updated(filename):

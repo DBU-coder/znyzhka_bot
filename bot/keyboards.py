@@ -25,6 +25,6 @@ def get_delete_from_wishlist_ikb(product_id: int) -> InlineKeyboardMarkup:
 
 
 def get_add_to_wishlist_ikb(link: str):
-    builder = InlineKeyboardBuilder()
+    builder = InlineKeyboardBuilder()  # TODO: Fix error ValueError: Resulted callback data is too long!
     builder.button(text='Додати до Обраного', callback_data=WishlistCallback(slug=get_slug(link), action='add'))
     return builder.as_markup()

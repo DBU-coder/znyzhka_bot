@@ -11,8 +11,8 @@ from bot.data import database as db
 from bot.filters import UrlFilter
 from bot.keyboards import get_add_to_wishlist_ikb
 from bot.utils.func import get_category_products, is_datafile_updated
-from parsers.atb_parser import config
-from parsers.atb_parser import parser as atb_parser
+from parser.atb_parser import config
+from parser.atb_parser import parser as atb_parser
 
 router = Router()
 

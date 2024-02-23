@@ -5,7 +5,7 @@ from aiogram.filters.callback_data import CallbackData
 from aiogram.types import CallbackQuery
 
 import bot.data.database as db
-from parsers.atb_parser import parser as atb_parser
+from parser.atb_parser import parser as atb_parser
 
 router = Router()
 
