@@ -9,10 +9,10 @@ from aiogram.utils.markdown import hbold, hide_link, hlink, hstrikethrough
 
 from bot.data import database as db
 from bot.filters import UrlFilter
-from bot.keyboards import get_add_to_wishlist_ikb
 from bot.utils.func import get_category_products, is_datafile_updated
 from parser.atb_parser import config
 from parser.atb_parser import parser as atb_parser
+from parser.atbparser import ATBProductParser
 
 router = Router()
 
@@ -47,7 +47,7 @@ async def category_products(message: types.Message, index: Match[str]):
             with_card_price = product.get('with_card')
             if with_card_price:
                 card += f"З картою АТБ 💳: {hbold(with_card_price, 'грн.')}"
-            await message.answer(card, reply_markup=get_add_to_wishlist_ikb(product['link']))
+            await message.answer(card)
             await sleep(1.2)
     except IndexError:
         msg = '''
@@ -63,11 +63,13 @@ async def add_to_wishlist(message: types.Message):
     url = message.text
     product_data = db.get_product(url)
     if not product_data:
-        product = await atb_parser.collect_fav_products_info(url=url)
+        parser = ATBProductParser()
+        products = await parser.get_data_from_urls(urls=[url])
+        product = products[0]
         product_id = db.create_product(title=product.title,
-                                             url=product.url,
-                                             price=product.price,
-                                             price_with_card=product.price_with_card)
+                                       url=product.url,
+                                       price=product.price,
+                                       price_with_card=product.price_with_card)
     else:
         product_id = product_data[0]
     user = db.get_user(message.from_user.id)

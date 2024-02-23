@@ -5,7 +5,7 @@ from datetime import datetime
 from aiogram.utils.markdown import hbold, hlink, hstrikethrough
 
 import bot.data.database as db
-from parser.atbparser import ATBFavoriteProductParser
+from parser.atbparser import ATBProductParser
 
 
 def is_datafile_updated(filename):
@@ -64,8 +64,8 @@ async def check_price(bot):
     while True:
         db.delete_unused_products()
         old_products = db.get_all_products()
-        parser = ATBFavoriteProductParser(urls=[product.url for product in old_products])
-        new_products = await parser.get_data_from_all_urls()
+        parser = ATBProductParser()
+        new_products = await parser.get_data_from_urls(urls=[product.url for product in old_products])
         new_products.sort(key=lambda x: x.url)
         for old_product, new_product in zip(old_products, new_products):
             if old_product.last_price != new_product.price:

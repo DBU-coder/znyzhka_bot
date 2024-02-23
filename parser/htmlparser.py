@@ -9,16 +9,14 @@ from requests_html import AsyncHTMLSession
 
 
 class HTMLParser(ABC):
-    _URLS: Sequence[str] = []
     _PARAMS: ClassVar[dict[str, str | int]] = {}
     _HEADERS: ClassVar[dict[str, str]] = {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;\
         q=0.8,application/signed-exchange;v=b3;q=0.7'
     }
 
-    def __init__(self, urls: Sequence[str]):
+    def __init__(self):
         self._HEADERS['User-Agent'] = UserAgent().random
-        self._URLS = urls
 
     @abstractmethod
     def _parse_product_data(self, response: Response) -> Sequence[dict]:
@@ -32,6 +30,6 @@ class HTMLParser(ABC):
             logging.exception(f"An error occurred while fetching data from {url}: {e}")
             return []
 
-    async def get_data_from_all_urls(self) -> Sequence:
+    async def get_data_from_urls(self, urls: Sequence[str]) -> Sequence:
         session = AsyncHTMLSession()
-        return await gather(*[self.__fetch_product_data(session, url) for url in self._URLS])
+        return await gather(*[self.__fetch_product_data(session, url) for url in urls])

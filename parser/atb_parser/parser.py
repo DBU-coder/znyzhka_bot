@@ -1,18 +1,10 @@
 import asyncio
 import json
-from typing import NamedTuple
 
 from requests import Response
 from requests_html import AsyncHTMLSession
 
 from .config import DATA_FILE, HEADERS, PER_PAGE, URL
-
-
-class Product(NamedTuple):
-    title: str
-    url: str
-    price: float
-    price_with_card: float | None
 
 
 async def parse_product_data(html_block) -> dict:
@@ -30,16 +22,6 @@ async def parse_product_data(html_block) -> dict:
     if with_card_price:
         product_data.update(with_card=float(with_card_price.attrs['value']))
     return product_data
-
-
-async def parse_favorite_product_data(session: AsyncHTMLSession, product_url: str) -> NamedTuple:
-    """Parse data for products in wishlist."""
-    response = await session.get(product_url, headers=HEADERS)
-    price = float(response.html.xpath('//*[@id="productMain"]/div/div[3]/div[1]/data/span', first=True).text)
-    with_card_block = response.html.find('data.atbcard-sale__price-top', first=True)
-    title = response.html.find('h1.product-page__title', first=True).text
-    price_with_card = float(with_card_block.text) if with_card_block else None
-    return Product(title, product_url, price, price_with_card)
 
 
 async def get_page_products(response: Response) -> list[dict]:
@@ -86,19 +68,6 @@ async def create_category_tasks():
     return await asyncio.gather(*tasks)
 
 
-async def create_product_data_tasks(links: list):
-    s = AsyncHTMLSession()
-    tasks = [parse_favorite_product_data(s, link) for link in links]
-    return await asyncio.gather(*tasks)
-
-
-async def collect_price(links: list):
-    loop = asyncio.get_event_loop()
-    tasks = create_product_data_tasks(links)
-    result = await loop.create_task(tasks)
-    return result
-
-
 async def collect_cat_info() -> None:
     loop = asyncio.get_event_loop()
     tasks = create_category_tasks()
@@ -106,10 +75,3 @@ async def collect_cat_info() -> None:
     results.sort(key=lambda x: x['name'])
     with open(DATA_FILE, 'w') as file:
         json.dump(results, file, indent=4, ensure_ascii=False)
-
-
-async def collect_fav_products_info(url):
-    loop = asyncio.get_event_loop()
-    s = AsyncHTMLSession()
-    result = await loop.create_task(parse_favorite_product_data(s, url))
-    return result

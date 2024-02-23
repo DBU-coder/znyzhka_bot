@@ -1,4 +1,4 @@
-from typing import Sequence, NamedTuple
+from typing import NamedTuple
 
 from requests import Response
 
@@ -12,10 +12,7 @@ class Product(NamedTuple):
     price_with_card: float | None
 
 
-class ATBFavoriteProductParser(HTMLParser):
-
-    def __init__(self, urls: Sequence[str]):
-        super().__init__(urls)
+class ATBProductParser(HTMLParser):
 
     def _parse_product_data(self, response: Response) -> Product:
         title = response.html.find('h1.product-page__title', first=True).text
