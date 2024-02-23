@@ -20,7 +20,7 @@ async def on_startup():
     asyncio.create_task(check_price(bot))
 
 
-async def main():
+async def starting_bot():
     logging.basicConfig(level=logging.INFO)
     dp = Dispatcher()
     dp.include_router(main_router)
@@ -29,4 +29,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(starting_bot())

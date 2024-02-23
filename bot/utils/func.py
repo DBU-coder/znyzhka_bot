@@ -5,7 +5,7 @@ from datetime import datetime
 from aiogram.utils.markdown import hbold, hlink, hstrikethrough
 
 import bot.data.database as db
-from parser.atb_parser.parser import collect_price
+from parser.atbparser import ATBFavoriteProductParser
 
 
 def is_datafile_updated(filename):
@@ -42,7 +42,7 @@ def get_slug(link: str) -> str:
 
 
 async def notify_price_change(bot, product, new_price):
-    users = await db.get_product_users(product.id)
+    users = db.get_product_users(product.id)
     message = (f'‼️Ціна на товар: <b>{hlink(product.title, product.url)}</b> змінилась‼️\n'
                f'Стара: {hstrikethrough(product.last_price, "грн.")} Нова: {hbold(new_price, "грн.")}')
     await send_notifications(bot, users, message)
@@ -64,10 +64,9 @@ async def check_price(bot):
     while True:
         db.delete_unused_products()
         old_products = db.get_all_products()
-        links = [product.url for product in old_products]
-        new_products = await collect_price(links)
+        parser = ATBFavoriteProductParser(urls=[product.url for product in old_products])
+        new_products = await parser.get_data_from_all_urls()
         new_products.sort(key=lambda x: x.url)
-
         for old_product, new_product in zip(old_products, new_products):
             if old_product.last_price != new_product.price:
                 await notify_price_change(bot, old_product, new_product.price)
@@ -76,4 +75,4 @@ async def check_price(bot):
                 await notify_card_price_change(bot, old_product, new_product.price_with_card)
                 db.update_price(product_id=old_product.id, column_name='price_with_card',
                                 new_price=new_product.price_with_card)
-        await asyncio.sleep(3600)
+        await asyncio.sleep(20)

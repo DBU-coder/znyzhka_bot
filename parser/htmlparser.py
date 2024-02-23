@@ -9,15 +9,16 @@ from requests_html import AsyncHTMLSession
 
 
 class HTMLParser(ABC):
-    _URLS: ClassVar[Sequence[str]] = []
+    _URLS: Sequence[str] = []
     _PARAMS: ClassVar[dict[str, str | int]] = {}
     _HEADERS: ClassVar[dict[str, str]] = {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;\
         q=0.8,application/signed-exchange;v=b3;q=0.7'
     }
 
-    def __init__(self):
+    def __init__(self, urls: Sequence[str]):
         self._HEADERS['User-Agent'] = UserAgent().random
+        self._URLS = urls
 
     @abstractmethod
     def _parse_product_data(self, response: Response) -> Sequence[dict]:
