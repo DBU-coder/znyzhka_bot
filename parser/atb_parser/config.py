@@ -1,7 +1,4 @@
 URL = 'https://www.atbmarket.com/promo/sale_tovari'
-HEADERS = {
-
-}
 # Quantity products per page.
 PER_PAGE = 36
 

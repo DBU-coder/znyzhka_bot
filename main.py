@@ -1,17 +1,14 @@
 import asyncio
 import logging
-import os
 
 from aiogram import Bot, Dispatcher
-from dotenv import load_dotenv
 
 from bot.data import database as db
 from bot.handlers import router as main_router
 from bot.utils.func import check_price
+from config import configure
 
-load_dotenv()
-
-bot = Bot(token=os.getenv('BOT_TOKEN'), parse_mode='HTML')
+bot = Bot(token=configure.bot.token, parse_mode='HTML')
 
 
 async def on_startup():
