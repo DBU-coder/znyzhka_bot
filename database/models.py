@@ -1,7 +1,13 @@
 from sqlalchemy import Integer, String, ForeignKey, BigInteger, Float, Boolean
+from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlalchemy.orm import DeclarativeBase, relationship
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
+
+
+async def process_scheme(engine: AsyncEngine):
+    async with engine.begin() as conn:
+        await conn.run_sync(BaseModel.metadata.create_all)
 
 
 # declarative base class
@@ -14,6 +20,10 @@ class User(BaseModel):
 
     user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True, unique=True, nullable=False)
     full_name: Mapped[str] = mapped_column(String(64), nullable=True)
+
+    products: Mapped[list['UserProduct']] = relationship(back_populates='user')
+
+
 
     def __repr__(self) -> str:
         return f'User({self.user_id=} {self.full_name=})'
@@ -50,3 +60,15 @@ class Category(BaseModel):
 
     def __repr__(self):
         return f'Category({self.id=} {self.title=})'
+
+
+class UserProduct(BaseModel):
+    __tablename__ = 'user_product'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('user.user_id'), nullable=False)
+    product_id: Mapped[int] = mapped_column(ForeignKey('product.id'), nullable=False)
+    user: Mapped[list[Product]] = relationship(back_populates='products')
+
+    def __repr__(self):
+        return f'UserProduct({self.id=} {self.user_id=} {self.product_id=})'
