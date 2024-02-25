@@ -4,7 +4,7 @@ from database.models import UserProduct
 from database.repositories.abstract import Repository
 
 
-class ProductRepository(Repository[UserProduct]):
+class UserProductRepository(Repository[UserProduct]):
     def __init__(self, session: AsyncSession):
         super().__init__(type_model=UserProduct, session=session)
 

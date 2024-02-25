@@ -1,8 +1,6 @@
-from sqlalchemy import Integer, String, ForeignKey, BigInteger, Float, Boolean
+from sqlalchemy import BigInteger, Boolean, Float, ForeignKey, Integer, String
 from sqlalchemy.ext.asyncio import AsyncEngine
-from sqlalchemy.orm import DeclarativeBase, relationship
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
 async def process_scheme(engine: AsyncEngine):
@@ -22,8 +20,6 @@ class User(BaseModel):
     full_name: Mapped[str] = mapped_column(String(64), nullable=True)
 
     products: Mapped[list['UserProduct']] = relationship(back_populates='user')
-
-
 
     def __repr__(self) -> str:
         return f'User({self.user_id=} {self.full_name=})'
