@@ -14,7 +14,7 @@ def create_engine(url: URL | str) -> AsyncEngine:
 
 
 def create_session_maker(engine: AsyncEngine) -> async_sessionmaker:
-    return async_sessionmaker(engine, expire_on_commit=True)
+    return async_sessionmaker(engine)
 
 
 class Database:
