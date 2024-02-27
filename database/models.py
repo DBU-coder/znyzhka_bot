@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, Boolean, Float, ForeignKey, Integer, String
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -16,7 +16,7 @@ class BaseModel(DeclarativeBase):
 class User(BaseModel):
     __tablename__ = 'user'
 
-    user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True, unique=True, nullable=False)
+    user_id: Mapped[int] = mapped_column(primary_key=True)
     full_name: Mapped[str] = mapped_column(String(64), nullable=True)
 
     products: Mapped[list['UserProduct']] = relationship(back_populates='user')
@@ -29,15 +29,15 @@ class Product(BaseModel):
     __tablename__ = 'product'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str] = mapped_column(String(255), nullable=False)
-    image: Mapped[str] = mapped_column(String, nullable=True)
-    url: Mapped[str] = mapped_column(String, nullable=False, unique=True)
-    price: Mapped[float] = mapped_column(Float, nullable=False)
-    old_price: Mapped[float] = mapped_column(Float, nullable=True)
-    price_with_card: Mapped[float] = mapped_column(Float, nullable=True)
-    discount_percent: Mapped[int] = mapped_column(Integer)
-    in_wishlist: Mapped[bool] = mapped_column(Boolean, default=False)
-    category_id: Mapped[int] = mapped_column(Integer, ForeignKey('category.id'), nullable=False)
+    title: Mapped[str] = mapped_column(String(255))
+    image: Mapped[str] = mapped_column(nullable=True)
+    url: Mapped[str] = mapped_column(unique=True)
+    price: Mapped[float]
+    old_price: Mapped[float] = mapped_column(nullable=True)
+    price_with_card: Mapped[float] = mapped_column(nullable=True)
+    discount_percent: Mapped[int]
+    in_wishlist: Mapped[bool] = mapped_column(default=False)
+    category_id: Mapped[int] = mapped_column(ForeignKey('category.id'))
 
     category: Mapped['Category'] = relationship(back_populates='products')
 
@@ -49,8 +49,8 @@ class Category(BaseModel):
     __tablename__ = 'category'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str] = mapped_column(String(255), nullable=False)
-    url: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    title: Mapped[str] = mapped_column(String(255))
+    url: Mapped[str] = mapped_column(unique=True)
 
     products: Mapped[list[Product]] = relationship(back_populates='category')
 
@@ -62,8 +62,8 @@ class UserProduct(BaseModel):
     __tablename__ = 'user_product'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('user.user_id'), nullable=False)
-    product_id: Mapped[int] = mapped_column(ForeignKey('product.id'), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey('user.user_id'))
+    product_id: Mapped[int] = mapped_column(ForeignKey('product.id'))
     user: Mapped[list[Product]] = relationship(back_populates='products')
 
     def __repr__(self):

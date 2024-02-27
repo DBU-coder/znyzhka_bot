@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import User
@@ -11,7 +13,7 @@ class UserRepository(Repository[User]):
     async def new(
         self,
         user_id: int,
-        full_name: str | None = None,
+        full_name: Optional[str] = None,
     ) -> User:
         new_user = User(user_id=user_id, full_name=full_name)
         return await self.session.merge(new_user)
