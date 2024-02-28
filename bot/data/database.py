@@ -9,7 +9,8 @@ def namedtuple_factory(cursor, row):
 
 
 def create_tables():
-    cur.executescript("""
+    cur.executescript(
+        """
     CREATE TABLE IF NOT EXISTS user (
         id integer PRIMARY KEY AUTOINCREMENT,
         tg_id integer UNIQUE
@@ -27,7 +28,8 @@ def create_tables():
         product_id integer REFERENCES product(id),
         CONSTRAINT user_prod_pk PRIMARY KEY (user_id, product_id)
     );
-    """)
+    """
+    )
     db.commit()
 
 
@@ -42,9 +44,12 @@ def get_user(tg_id):
 
 
 def get_product_users(product_id):
-    cur.execute("""SELECT * FROM user 
+    cur.execute(
+        """SELECT * FROM user 
     INNER JOIN user_product ON user.id = user_product.user_id 
-    WHERE user_product.product_id = ?""", (product_id,))
+    WHERE user_product.product_id = ?""",
+        (product_id,),
+    )
     return cur.fetchall()
 
 
@@ -55,7 +60,7 @@ def get_product(url):
 def create_product(*, title: str, url: str, price: float, price_with_card: float):
     cur.execute(
         "INSERT INTO product(title, url, last_price, price_with_card) VALUES (?, ?, ?, ?)",
-        (title, url, price, price_with_card)
+        (title, url, price, price_with_card),
     )
     db.commit()
     return cur.lastrowid
@@ -68,9 +73,12 @@ def add_to_wishlist(user_id, product_id):
 
 def get_user_wishlist(tg_id):
     user = cur.execute("SELECT id FROM user WHERE tg_id = ?", (tg_id,)).fetchone()
-    cur.execute("""SELECT product.* FROM product 
+    cur.execute(
+        """SELECT product.* FROM product 
     INNER JOIN user_product ON product.id = user_product.product_id
-    WHERE user_product.user_id = ?""", (user[0],))
+    WHERE user_product.user_id = ?""",
+        (user[0],),
+    )
     return cur.fetchall()
 
 
@@ -85,7 +93,7 @@ def delete_unused_products():
 
 
 def get_all_products():
-    return cur.execute("SELECT * FROM product ORDER BY url") .fetchall()
+    return cur.execute("SELECT * FROM product ORDER BY url").fetchall()
 
 
 def update_price(product_id: int, column_name: str, new_price: float):
@@ -93,6 +101,6 @@ def update_price(product_id: int, column_name: str, new_price: float):
     db.commit()
 
 
-with sq.connect('bot/data/bot_database.db') as db:
+with sq.connect("bot/data/bot_database.db") as db:
     db.row_factory = namedtuple_factory
     cur = db.cursor()

@@ -14,19 +14,19 @@ class BaseModel(DeclarativeBase):
 
 
 class User(BaseModel):
-    __tablename__ = 'user'
+    __tablename__ = "user"
 
     user_id: Mapped[int] = mapped_column(primary_key=True)
     full_name: Mapped[str] = mapped_column(String(64), nullable=True)
 
-    products: Mapped[list['UserProduct']] = relationship(back_populates='user')
+    products: Mapped[list["UserProduct"]] = relationship(back_populates="user")
 
     def __repr__(self) -> str:
-        return f'User({self.user_id=} {self.full_name=})'
+        return f"User({self.user_id=} {self.full_name=})"
 
 
 class Product(BaseModel):
-    __tablename__ = 'product'
+    __tablename__ = "product"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(255))
@@ -37,34 +37,34 @@ class Product(BaseModel):
     price_with_card: Mapped[float] = mapped_column(nullable=True)
     discount_percent: Mapped[int]
     in_wishlist: Mapped[bool] = mapped_column(default=False)
-    category_id: Mapped[int] = mapped_column(ForeignKey('category.id'))
+    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
 
-    category: Mapped['Category'] = relationship(back_populates='products')
+    category: Mapped["Category"] = relationship(back_populates="products")
 
     def __repr__(self):
-        return f'Product({self.id=} {self.title=} {self.price} {self.category_id=})'
+        return f"Product({self.id=} {self.title=} {self.price} {self.category_id=})"
 
 
 class Category(BaseModel):
-    __tablename__ = 'category'
+    __tablename__ = "category"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(255))
     url: Mapped[str] = mapped_column(unique=True)
 
-    products: Mapped[list[Product]] = relationship(back_populates='category')
+    products: Mapped[list[Product]] = relationship(back_populates="category")
 
     def __repr__(self):
-        return f'Category({self.id=} {self.title=})'
+        return f"Category({self.id=} {self.title=})"
 
 
 class UserProduct(BaseModel):
-    __tablename__ = 'user_product'
+    __tablename__ = "user_product"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('user.user_id'))
-    product_id: Mapped[int] = mapped_column(ForeignKey('product.id'))
-    user: Mapped[list[Product]] = relationship(back_populates='products')
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.user_id"))
+    product_id: Mapped[int] = mapped_column(ForeignKey("product.id"))
+    user: Mapped[list[User]] = relationship(back_populates="products")
 
     def __repr__(self):
-        return f'UserProduct({self.id=} {self.user_id=} {self.product_id=})'
+        return f"UserProduct({self.id=} {self.user_id=} {self.product_id=})"

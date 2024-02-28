@@ -8,12 +8,12 @@ from bot.handlers import router as main_router
 from bot.utils.func import check_price
 from config import configure
 
-bot = Bot(token=configure.bot.token, parse_mode='HTML')
+bot = Bot(token=configure.bot.token, parse_mode="HTML")
 
 
 async def on_startup():
     db.create_tables()
-    logging.info('DB connected successfully.')
+    logging.info("DB connected successfully.")
     asyncio.create_task(check_price(bot))
 
 

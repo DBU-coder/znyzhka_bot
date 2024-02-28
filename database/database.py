@@ -1,9 +1,17 @@
 from sqlalchemy import URL
-from sqlalchemy.ext.asyncio import (AsyncEngine, AsyncSession,
-                                    async_sessionmaker, create_async_engine)
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
-from database.repositories import (CategoryRepository, ProductRepository,
-                                   UserProductRepository, UserRepository)
+from database.repositories import (
+    CategoryRepository,
+    ProductRepository,
+    UserProductRepository,
+    UserRepository,
+)
 
 
 def create_engine(url: URL | str) -> AsyncEngine:

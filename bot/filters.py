@@ -5,7 +5,7 @@ from aiogram.types import Message
 
 
 class UrlFilter(Filter):
-    PATTERN = r'^(http|https):\/\/({})(\.[\w.-]+)+([\/\w\.-]*)*\/?$'
+    PATTERN = r"^(http|https):\/\/({})(\.[\w.-]+)+([\/\w\.-]*)*\/?$"
 
     def __init__(self, store_url: str):
         self.store_url = store_url
