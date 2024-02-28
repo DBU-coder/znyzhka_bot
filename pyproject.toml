@@ -1,0 +1,48 @@
+[tool.poetry]
+name = "product-sales"
+version = "0.1.0"
+description = ""
+authors = ["Dmytro Bukrieiev <dbucoder@gmail.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+aiogram = "^3.4.1"
+requests-html = "^0.10.0"
+sqlalchemy = "^2.0.27"
+python-dotenv = "^1.0.1"
+aiosqlite = "^0.20.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "*"
+isort = "^5.13.2"
+mypy = "^1.8.0"
+ruff = "^0.2.2"
+
+[tool.isort]
+profile = "black"
+
+[tool.black]
+line-length = 120
+
+[tool.ruff]
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "UP", "I", "PL", "ISC", "RUF"]
+unfixable = ["B"]
+ignore = ["E501", "RUF001", "B024", "PLR2004", "RUF009", "PLR0913"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+pretty = true
+check_untyped_defs = true
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
