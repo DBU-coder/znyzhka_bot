@@ -9,7 +9,5 @@ class CategoryRepository(Repository[Category]):
         super().__init__(type_model=Category, session=session)
 
     async def new(self, title: str, url: str) -> Category:
-        new_category = await self.session.merge(
-            Category(title=title, url=url)
-        )
+        new_category = await self.session.merge(Category(title=title, url=url))
         return new_category
