@@ -1,4 +1,5 @@
-from typing import TypedDict, NamedTuple, Callable
+from collections.abc import Callable
+from typing import NamedTuple, TypedDict
 
 from sqlalchemy.ext.asyncio import AsyncSession
 

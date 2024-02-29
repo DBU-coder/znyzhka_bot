@@ -5,7 +5,7 @@ from fake_useragent import UserAgent
 from requests import Response
 from requests_html import HTML, AsyncHTMLSession
 
-from bot.data_structure import ParsedProduct, ParsedCategory
+from bot.data_structure import ParsedCategory, ParsedProduct
 
 
 class ATBProductParser:

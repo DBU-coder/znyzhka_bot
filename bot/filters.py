@@ -11,4 +11,5 @@ class UrlFilter(Filter):
         self.store_url = store_url
 
     async def __call__(self, message: Message):
-        return bool(fullmatch(self.PATTERN.format(self.store_url), message.text))
+        if message.text:
+            return bool(fullmatch(self.PATTERN.format(self.store_url), message.text))

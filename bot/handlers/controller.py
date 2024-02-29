@@ -1,6 +1,7 @@
 from aiogram import Dispatcher
 
 from bot.middlewares import DatabaseMiddleware, RegisterUserMiddleware
+
 from .commands import router as commands_router
 from .common import router as common_router
 

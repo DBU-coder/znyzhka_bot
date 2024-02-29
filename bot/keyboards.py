@@ -1,7 +1,5 @@
-from aiogram.types import InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
-from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
-
-from bot.handlers.callbacks import WishlistCallback
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
+from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 
 def get_choice_store_kb(**kwargs) -> ReplyKeyboardMarkup:
@@ -14,9 +12,3 @@ def get_choice_store_kb(**kwargs) -> ReplyKeyboardMarkup:
     )
     builder.adjust(3, 1)
     return builder.as_markup(resize_keyboard=True, **kwargs)
-
-
-def get_delete_from_wishlist_ikb(product_id: int) -> InlineKeyboardMarkup:
-    builder = InlineKeyboardBuilder()
-    builder.button(text="Видалити з Обраного", callback_data=WishlistCallback(product_id=product_id, action="delete"))
-    return builder.as_markup()
