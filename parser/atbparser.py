@@ -1,25 +1,11 @@
 from asyncio import gather
-from typing import ClassVar, TypedDict, NamedTuple
+from typing import ClassVar
 
 from fake_useragent import UserAgent
 from requests import Response
 from requests_html import HTML, AsyncHTMLSession
 
-
-class Product(NamedTuple):
-    title: str
-    image: str | None
-    url: str
-    price: float
-    old_price: float | None
-    price_with_card: float | None
-    discount_percent: int
-    cat_url: str
-
-
-class Category(TypedDict):
-    title: str
-    url: str
+from bot.data_structure import ParsedProduct, ParsedCategory
 
 
 class ATBProductParser:
@@ -34,12 +20,12 @@ class ATBProductParser:
         self._HEADERS["User-Agent"] = UserAgent().random
 
     @staticmethod
-    def _parse_product_data(product_card: HTML, cat_url: str) -> Product:
+    def _parse_product_data(product_card: HTML, cat_url: str) -> ParsedProduct:
         """Parse product data from given HTML block."""
 
         title_block = product_card.find(".catalog-item__title", first=True)
         with_card_price = product_card.find("data.atbcard-sale__price-top", first=True)
-        product = Product(
+        product = ParsedProduct(
             title=title_block.text.strip(),
             image=product_card.find("img", first=True).attrs["src"],
             url="https://www.atbmarket.com" + title_block.find("a", first=True).attrs["href"],
@@ -51,7 +37,7 @@ class ATBProductParser:
         )
         return product
 
-    async def _parse_product_cards(self, response: Response) -> list[Product]:
+    async def _parse_product_cards(self, response: Response) -> list[ParsedProduct]:
         cards = response.html.find("article.catalog-item")  # type: ignore
         page_data = []
         for card in cards:
@@ -62,7 +48,9 @@ class ATBProductParser:
                 page_data.append(product_data)
         return page_data
 
-    async def _fetch_page_data(self, session: AsyncHTMLSession, url: str, params: dict | None = None) -> list[Product]:
+    async def _fetch_page_data(
+        self, session: AsyncHTMLSession, url: str, params: dict | None = None
+    ) -> list[ParsedProduct]:
         response = await session.get(url, headers=self._HEADERS, params=params)
         print(url)
         return await self._parse_product_cards(response)
@@ -103,11 +91,11 @@ class ATBCategoryParser:
         categories = response.html.find("div.catalog-subcategory-list", first=True)
         return categories.absolute_links
 
-    async def parse_category_products(self, session: AsyncHTMLSession, url: str) -> Category:
+    async def parse_category_products(self, session: AsyncHTMLSession, url: str) -> ParsedCategory:
         response = await session.get(url, headers=self._HEADERS)
         title = response.html.find("span.custom-tag--white-active", first=True).text
         print(title)
-        return Category(title=title, url=url)
+        return ParsedCategory(title=title, url=url)
 
     async def get_data(self):
         session = AsyncHTMLSession()
