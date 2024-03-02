@@ -20,7 +20,7 @@ class ProductRepository(Repository[Product]):
         price_with_card: float | None = None,
         in_wishlist: bool = False,
     ) -> Product:
-        new_user = await self.session.merge(
+        new_product = await self.session.merge(
             Product(
                 title=title,
                 image=image,
@@ -33,4 +33,4 @@ class ProductRepository(Repository[Product]):
                 category_id=category_id,
             )
         )
-        return new_user
+        return new_product

@@ -3,7 +3,7 @@ from collections.abc import Sequence
 from typing import Generic, TypeVar
 
 from sqlalchemy import delete, select
-from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 AbstractModel = TypeVar("AbstractModel")

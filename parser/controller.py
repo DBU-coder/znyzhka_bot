@@ -1,11 +1,13 @@
-from atbparser import ATBCategoryParser, ATBProductParser
+from database import Category, Database
 
-from database import Database
+from .atbparser import ATBCategoryParser, ATBProductParser
 
 
 async def parse_category(db: Database) -> None:
     parser = ATBCategoryParser()
     parsed_data = await parser.get_data()
+    urls = [category["url"] for category in parsed_data]
+    await db.category.delete(Category.url.not_in(urls))
     await db.category.insert(parsed_data)
 
 
