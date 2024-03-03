@@ -1,6 +1,7 @@
 import asyncio
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
 from loguru import logger
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
@@ -19,7 +20,10 @@ async def set_up_parser(session_maker: async_sessionmaker) -> None:
 async def starting_bot():
 
     # Dispatcher
-    bot = Bot(token=configure.bot.token, parse_mode="HTML")
+    bot = Bot(
+        token=configure.bot.token,
+        default=DefaultBotProperties(parse_mode="HTML", disable_notification=True),
+    )
     await bot.set_my_commands(bot_commands)
     dp = Dispatcher()
     register_handlers(dp)
