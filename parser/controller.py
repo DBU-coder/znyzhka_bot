@@ -13,10 +13,10 @@ async def parse_category(db: Database) -> None:
 
 async def parse_products(db: Database) -> None:
     categories = await db.category.get_many()
-    cat_urls_to_id = {category.url: category.id for category in categories}
-    parser = ATBProductParser([item.url for item in categories])
+    category_urls_to_id = {category.url: category.id for category in categories}
+    parser = ATBProductParser(category_urls_to_id.keys())
     data = await parser.get_data()
-    data_to_db = [
+    data_to_insert = [
         {
             "title": item.title,
             "image": item.image,
@@ -26,8 +26,8 @@ async def parse_products(db: Database) -> None:
             "price_with_card": item.price_with_card,
             "discount_percent": item.discount_percent,
             "in_wishlist": False,
-            "category_id": cat_urls_to_id[item.cat_url],
+            "category_id": category_urls_to_id[item.cat_url],
         }
         for item in data
     ]
-    await db.product.insert(data_to_db)
+    await db.product.insert(data_to_insert)

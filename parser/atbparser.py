@@ -1,4 +1,5 @@
 from asyncio import gather
+from collections.abc import Iterable
 from typing import ClassVar
 
 from fake_useragent import UserAgent
@@ -15,7 +16,7 @@ class ATBProductParser:
         q=0.8,application/signed-exchange;v=b3;q=0.7"
     }
 
-    def __init__(self, urls: list[str]):
+    def __init__(self, urls: Iterable[str]):
         self.urls = urls
         self._HEADERS["User-Agent"] = UserAgent().random
 
