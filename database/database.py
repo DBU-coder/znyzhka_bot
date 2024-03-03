@@ -15,7 +15,7 @@ from database.repositories import (
 
 
 @event.listens_for(Engine, "connect")
-def set_sqlite_pragma(dbapi_connection, connection_record):
+def set_sqlite_pragma(dbapi_connection, _):
     """
     Enable foreign key support in SQLite.
     https://docs.sqlalchemy.org/en/20/dialects/sqlite.html#sqlite-foreign-keys

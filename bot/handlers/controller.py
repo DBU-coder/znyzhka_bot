@@ -1,8 +1,15 @@
 from aiogram import Dispatcher
+from aiogram.types import BotCommand
 
 from bot.middlewares import DatabaseMiddleware, RegisterUserMiddleware
 
 from .commands import router as commands_router
+
+bot_commands = [
+    BotCommand(command="/start", description="Початок роботи з ботом"),
+    BotCommand(command="/watchlist", description="Переглянути список обраних товарів"),
+    BotCommand(command="/help", description="Допомога"),
+]
 
 
 def register_handlers(dp: Dispatcher) -> None:

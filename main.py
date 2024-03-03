@@ -5,7 +5,7 @@ from loguru import logger
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from bot.data_structure import ContextData
-from bot.handlers.controller import register_handlers
+from bot.handlers.controller import bot_commands, register_handlers
 from config import configure
 from database import create_engine, create_session_maker
 from database.models import process_scheme
@@ -20,6 +20,7 @@ async def starting_bot():
 
     # Dispatcher
     bot = Bot(token=configure.bot.token, parse_mode="HTML")
+    await bot.set_my_commands(bot_commands)
     dp = Dispatcher()
     register_handlers(dp)
     logger.info("Bot starts")
@@ -29,7 +30,7 @@ async def starting_bot():
     engine = create_engine(db_url)
     session_maker = create_session_maker(engine)
     await process_scheme(engine)
-    await set_up_parser(session_maker)
+    # await set_up_parser(session_maker)
 
     await dp.start_polling(
         bot,

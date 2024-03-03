@@ -2,7 +2,7 @@ from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 
-def get_choice_store_kb(**kwargs) -> ReplyKeyboardMarkup:
+def select_store_kb(**kwargs) -> ReplyKeyboardMarkup:
     builder = ReplyKeyboardBuilder()
     builder.add(
         KeyboardButton(text="ATB"),
