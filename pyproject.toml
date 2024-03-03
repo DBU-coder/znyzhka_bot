@@ -17,10 +17,11 @@ loguru = "^0.7.2"
 aiojobs = "^1.2.1"
 
 [tool.poetry.group.dev.dependencies]
-black = "*"
+black = "^24.2.0"
 isort = "^5.13.2"
 mypy = "^1.8.0"
 ruff = "^0.2.2"
+pre-commit = "^3.6.2"
 
 [tool.isort]
 profile = "black"
@@ -42,7 +43,7 @@ ignore = ["E501", "RUF001", "B024", "PLR2004", "RUF009", "PLR0913"]
 [tool.mypy]
 python_version = "3.12"
 ignore_missing_imports = true
-pretty = true
+pretty = false
 check_untyped_defs = true
 
 [build-system]
