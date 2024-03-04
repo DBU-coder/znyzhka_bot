@@ -1,3 +1,5 @@
+import asyncio
+
 from aiogram import F, Router
 from aiogram.types import CallbackQuery, Message
 
@@ -32,11 +34,19 @@ async def prev_(query: CallbackQuery) -> None:
 @router.callback_query(NavigationCallback.filter(F.direction == "first"))
 async def first_(query: CallbackQuery) -> None:
     await pagination.on_first()
-    await query.message.edit_text(Messages.category_menu(pagination), reply_markup=await pagination.update_kb())  # type: ignore
+    await query.message.edit_text(  # type: ignore
+        text=Messages.category_menu(pagination), reply_markup=await pagination.update_kb()
+    )
 
 
 @router.callback_query(F.data.startswith("category_"))
-async def category_(query: CallbackQuery, db: Database) -> None:
+async def category_products(query: CallbackQuery, db: Database) -> None:
     category_id = int(query.data.split("_")[1])  # type: ignore
     category = await db.category.get(ident=category_id)
-    await query.message.answer(text=f"{category.products}")  # type: ignore
+    products = await category.awaitable_attrs.products  # type: ignore
+    if not products:
+        await query.message.answer(text=Messages.PRODUCTS_NOT_FOUND)  # type: ignore
+        return
+    for product in sorted(products, key=lambda x: x.discount_percent, reverse=True):
+        await query.message.answer(text=Messages.product_card(product))  # type: ignore
+        await asyncio.sleep(1)

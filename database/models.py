@@ -1,7 +1,7 @@
 from typing import Annotated, ClassVar
 
 from sqlalchemy import ForeignKey, String
-from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlalchemy.ext.asyncio import AsyncAttrs, AsyncEngine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 # Custom types
@@ -19,7 +19,7 @@ async def process_scheme(engine: AsyncEngine):
 
 
 # declarative base class
-class BaseModel(DeclarativeBase):
+class BaseModel(AsyncAttrs, DeclarativeBase):
     # Add custom types
     type_annotation_map: ClassVar[dict] = {
         str_256: String(256),
