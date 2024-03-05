@@ -4,7 +4,11 @@ from aiogram import F, Router
 from aiogram.types import CallbackQuery, Message
 
 from bot.handlers.messages import Messages
-from bot.keyboards.inline import get_category_buttons
+from bot.keyboards.inline import (
+    WatchlistCallback,
+    add_to_watchlist_ikb,
+    get_category_buttons,
+)
 from bot.keyboards.pagination import NavigationCallback, Paginator
 from database import Category, Database
 
@@ -48,5 +52,17 @@ async def category_products(query: CallbackQuery, db: Database) -> None:
         await query.message.answer(text=Messages.PRODUCTS_NOT_FOUND)  # type: ignore
         return
     for product in sorted(products, key=lambda x: x.discount_percent, reverse=True):
-        await query.message.answer(text=Messages.product_card(product))  # type: ignore
+        await query.message.answer(text=Messages.product_card(product), reply_markup=add_to_watchlist_ikb(product.id))  # type: ignore
         await asyncio.sleep(1)
+
+
+@router.callback_query(WatchlistCallback.filter(F.action == "add"))
+async def add_to_watchlist(query: CallbackQuery, callback_data: WatchlistCallback, db: Database) -> None:
+    product = await db.product.get(ident=callback_data.product_id)
+    user = await db.user.get(ident=query.from_user.id)
+    liked_products = await user.awaitable_attrs.liked_products  # type: ignore
+    if product in liked_products:
+        await query.answer(text=Messages.ALREADY_IN_WATCHLIST)
+        return
+    liked_products.append(product)
+    await query.answer(text=Messages.ADDED_TO_WATCHLIST)

@@ -6,7 +6,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 # Custom types
 str_256 = Annotated[str, 256]
-intpk = Annotated[int, mapped_column(primary_key=True)]
+intpk = Annotated[int, mapped_column(primary_key=True, autoincrement=True)]
 str_unique = Annotated[str, mapped_column(unique=True)]
 
 
@@ -72,6 +72,5 @@ class Category(BaseModel):
 class UserProduct(BaseModel):
     __tablename__ = "user_product"
 
-    id: Mapped[intpk]
     user_id: Mapped[int] = mapped_column(ForeignKey("user.user_id", ondelete="CASCADE"), primary_key=True)
     product_id: Mapped[int] = mapped_column(ForeignKey("product.id", ondelete="CASCADE"), primary_key=True)
