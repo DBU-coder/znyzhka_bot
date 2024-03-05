@@ -1,4 +1,6 @@
-from aiogram.utils.markdown import hbold, hide_link, hitalic, hstrikethrough
+from collections.abc import Sequence
+
+from aiogram.utils.markdown import hbold, hide_link, hitalic, hlink, hstrikethrough
 
 from bot.keyboards.pagination import Paginator
 from database import Product
@@ -33,3 +35,18 @@ class Messages:
         if product.price_with_card:
             card += f"\n\n{hbold('З картою АТБ')}💳: {hbold(str(product.price_with_card)+'₴')}"
         return card
+
+    @staticmethod
+    def get_watchlist(products: Sequence[Product]) -> str:
+        if products:
+            text = "\n\n".join(
+                (
+                    f"{hlink(product.title, product.url)}\n"
+                    f"{hstrikethrough(str(product.old_price)+'₴')} | "
+                    f"{str(product.price)+'₴'} | "
+                    f"💳:{hbold(str(product.price_with_card)+'₴')}"
+                )
+                for product in products
+            )
+            return text
+        return "Ваш список слідкування 📝 порожній."
