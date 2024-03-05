@@ -19,12 +19,14 @@ async def set_up_parser(session_maker: async_sessionmaker) -> None:
 
 async def starting_bot():
 
-    # Dispatcher
+    # Bot
     bot = Bot(
         token=configure.bot.token,
         default=DefaultBotProperties(parse_mode="HTML", disable_notification=True),
     )
     await bot.set_my_commands(bot_commands)
+
+    # Dispatcher
     dp = Dispatcher()
     register_handlers(dp)
     logger.info("Bot starts")
@@ -34,7 +36,7 @@ async def starting_bot():
     engine = create_engine(db_url)
     session_maker = create_session_maker(engine)
     await process_scheme(engine)
-    # await set_up_parser(session_maker)
+    await set_up_parser(session_maker)
 
     await dp.start_polling(
         bot,
