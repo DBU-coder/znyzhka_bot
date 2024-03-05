@@ -9,7 +9,6 @@ from sqlalchemy.ext.asyncio import (
 from database.repositories import (
     CategoryRepository,
     ProductRepository,
-    UserProductRepository,
     UserRepository,
 )
 
@@ -41,11 +40,9 @@ class Database:
     user: UserRepository
     product: ProductRepository
     category: CategoryRepository
-    user_product: UserProductRepository
 
     def __init__(self, session: AsyncSession):
         self.session = session
         self.user = UserRepository(session=session)
         self.product = ProductRepository(session=session)
         self.category = CategoryRepository(session=session)
-        self.user_product = UserProductRepository(session=session)

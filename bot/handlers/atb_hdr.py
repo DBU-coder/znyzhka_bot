@@ -19,7 +19,7 @@ pagination = Paginator(buttons_on_page=10)
 @router.message(F.text == "ATB")
 async def cmd_atb(message: Message, db: Database):
     categories = await db.category.get_many(order_by=Category.title.asc())
-    await pagination.add_buttons(buttons=get_category_buttons(categories))
+    pagination.buttons = get_category_buttons(categories)
     await message.answer(Messages.category_menu(pagination), reply_markup=await pagination.update_kb())
 
 

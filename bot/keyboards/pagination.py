@@ -12,18 +12,15 @@ class NavigationCallback(CallbackData, prefix="navigation"):
 
 class Paginator:
     def __init__(self, buttons: list[InlineKeyboardButton] | None = None, buttons_on_page: int = 3) -> None:
-        self.__buttons = buttons or []
+        self.buttons = buttons or []
         self.__buttons_on_page = buttons_on_page
         self.__current_page = 0
-
-    async def add_buttons(self, buttons: list[InlineKeyboardButton]) -> None:
-        self.__buttons.extend(buttons)
 
     async def update_kb(self) -> InlineKeyboardMarkup:
         builder = InlineKeyboardBuilder()
         from_ = self.__current_page * self.__buttons_on_page
         to_ = (self.__current_page + 1) * self.__buttons_on_page
-        builder.add(*[button for button in self.__buttons[from_:to_]])
+        builder.add(*[button for button in self.buttons[from_:to_]])
         builder.adjust(1, repeat=True)
 
         prev_button = InlineKeyboardButton(
@@ -40,7 +37,7 @@ class Paginator:
         if from_ <= 0:
             builder.row(current_page, next_button)
             return builder.as_markup()
-        elif to_ >= len(self.__buttons):
+        elif to_ >= len(self.buttons):
             builder.row(prev_button, current_page)
             return builder.as_markup()
 
@@ -57,7 +54,7 @@ class Paginator:
         self.__current_page = 0
 
     def __total_pages(self) -> int:
-        return ceil(len(self.__buttons) / self.__buttons_on_page)
+        return ceil(len(self.buttons) / self.__buttons_on_page)
 
     def __str__(self):
         return f"{self.__current_page + 1}/{self.__total_pages()}"
