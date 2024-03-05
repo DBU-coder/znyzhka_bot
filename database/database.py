@@ -6,11 +6,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from database.repositories import (
-    CategoryRepository,
-    ProductRepository,
-    UserRepository,
-)
+from database.repositories import CategoryRepository, ProductRepository, UserRepository
 
 
 @event.listens_for(Engine, "connect")

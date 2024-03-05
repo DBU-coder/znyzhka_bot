@@ -18,8 +18,8 @@ class ParsedProduct(NamedTuple):
     price: float
     old_price: float | None
     price_with_card: float | None
-    discount_percent: int
-    cat_url: str
+    discount_percent: int | None
+    cat_url: str | None
 
 
 class ParsedCategory(TypedDict):

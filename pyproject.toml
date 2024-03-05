@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "product-sales"
+name = "znyzhka_bot"
 version = "0.1.0"
 description = ""
 authors = ["Dmytro Bukrieiev <dbucoder@gmail.com>"]
