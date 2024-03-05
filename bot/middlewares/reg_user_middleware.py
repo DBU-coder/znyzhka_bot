@@ -17,6 +17,6 @@ class RegisterUserMiddleware(BaseMiddleware):
         db = data["db"]
         user_id = event.from_user.id  # type: ignore
         full_name = event.from_user.full_name  # type: ignore
-        if not (await db.user.get_by_where(User.user_id == user_id)):
-            await db.user.new(user_id=user_id, full_name=full_name)
+        if not (await db.user.get_by_where(User.tg_id == user_id)):
+            await db.user.new(tg_id=user_id, full_name=full_name)
         return await handler(event, data)

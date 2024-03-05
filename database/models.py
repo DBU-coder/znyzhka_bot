@@ -33,10 +33,12 @@ class BaseModel(AsyncAttrs, DeclarativeBase):
 class User(BaseModel):
     __tablename__ = "user"
 
-    user_id: Mapped[intpk]
+    tg_id: Mapped[intpk]
     full_name: Mapped[str_256 | None]
 
-    liked_products: Mapped[list["Product"]] = relationship(secondary="user_product", back_populates="users_liked")
+    tracks_products: Mapped[list["TrackableProduct"]] = relationship(
+        secondary="user_trackable_product", back_populates="users"
+    )
 
 
 class Product(BaseModel):
@@ -49,12 +51,25 @@ class Product(BaseModel):
     price: Mapped[float]
     old_price: Mapped[float | None]
     price_with_card: Mapped[float | None]
-    discount_percent: Mapped[int]
-    in_wishlist: Mapped[bool] = mapped_column(default=False)
+    discount_percent: Mapped[int | None]
     category_id: Mapped[int] = mapped_column(ForeignKey("category.id", ondelete="CASCADE"))
 
     category: Mapped["Category"] = relationship(back_populates="products")
-    users_liked: Mapped[list[User]] = relationship(secondary="user_product", back_populates="liked_products")
+
+
+class TrackableProduct(BaseModel):
+    __tablename__ = "trackable_product"
+
+    id: Mapped[intpk]
+    title: Mapped[str_256]
+    image: Mapped[str | None]
+    url: Mapped[str_unique]
+    price: Mapped[float]
+    old_price: Mapped[float | None]
+    price_with_card: Mapped[float | None]
+    discount_percent: Mapped[int | None]
+
+    users: Mapped[list[User]] = relationship(secondary="user_trackable_product", back_populates="tracks_products")
 
 
 class Category(BaseModel):
@@ -69,8 +84,10 @@ class Category(BaseModel):
     )
 
 
-class UserProduct(BaseModel):
-    __tablename__ = "user_product"
+class UserTrackableProduct(BaseModel):
+    __tablename__ = "user_trackable_product"
 
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.user_id", ondelete="CASCADE"), primary_key=True)
-    product_id: Mapped[int] = mapped_column(ForeignKey("product.id", ondelete="CASCADE"), primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.tg_id", ondelete="CASCADE"), primary_key=True)
+    trackable_product_id: Mapped[int] = mapped_column(
+        ForeignKey("trackable_product.id", ondelete="CASCADE"), primary_key=True
+    )

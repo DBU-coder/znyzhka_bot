@@ -10,8 +10,8 @@ class UserRepository(Repository[User]):
 
     async def new(
         self,
-        user_id: int,
+        tg_id: int,
         full_name: str | None = None,
     ) -> User:
-        new_user = User(user_id=user_id, full_name=full_name)
+        new_user = User(tg_id=tg_id, full_name=full_name)
         return await self.session.merge(new_user)

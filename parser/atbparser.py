@@ -49,9 +49,7 @@ class ATBProductParser:
                 page_data.append(product_data)
         return page_data
 
-    async def _fetch_page_data(
-        self, session: AsyncHTMLSession, url: str, params: dict | None = None
-    ) -> list[ParsedProduct]:
+    async def _fetch_page_data(self, session: AsyncHTMLSession, url: str, **params) -> list[ParsedProduct]:
         response = await session.get(url, headers=self._HEADERS, params=params)
         print(url)
         return await self._parse_product_cards(response)
@@ -90,7 +88,7 @@ class ATBCategoryParser:
     async def get_categories_links(self, session: AsyncHTMLSession) -> list:
         response = await session.get(url=self._URL, headers=self._HEADERS)
         categories = response.html.find("div.catalog-subcategory-list", first=True)
-        return categories.absolute_links
+        return list(categories.absolute_links)[:3]
 
     async def parse_category_products(self, session: AsyncHTMLSession, url: str) -> ParsedCategory:
         response = await session.get(url, headers=self._HEADERS)
