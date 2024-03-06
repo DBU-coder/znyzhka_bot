@@ -18,7 +18,6 @@ class ProductRepository(Repository[Product]):
         discount_percent: int,
         category_id: int,
         price_with_card: float | None = None,
-        in_wishlist: bool = False,
     ) -> Product:
         new_product = await self.session.merge(
             Product(
@@ -29,7 +28,6 @@ class ProductRepository(Repository[Product]):
                 old_price=old_price,
                 price_with_card=price_with_card,
                 discount_percent=discount_percent,
-                in_wishlist=in_wishlist,
                 category_id=category_id,
             )
         )
