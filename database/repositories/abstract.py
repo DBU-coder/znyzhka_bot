@@ -20,6 +20,14 @@ class Repository(Generic[AbstractModel], ABC):
     async def get(self, ident: int | str) -> AbstractModel | None:
         return await self.session.get(entity=self.type_model, ident=ident)
 
+    async def get_or_create(self, **kwargs) -> tuple[AbstractModel, bool]:
+        statement = select(self.type_model).filter_by(**kwargs)
+        instance = await self.session.scalar(statement)
+        if instance:
+            return instance, False
+        instance = await self.new(**kwargs)
+        return instance, True
+
     async def get_by_where(self, where_clause) -> AbstractModel | None:
         statement = select(self.type_model).where(where_clause)
         result = await self.session.scalars(statement)
