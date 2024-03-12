@@ -60,10 +60,11 @@ async def category_products(query: CallbackQuery, db: Database) -> None:
 async def add_to_watchlist(query: CallbackQuery, callback_data: WatchlistCallback, db: Database) -> None:
     product = await db.product.get(ident=callback_data.product_id)
     user = await db.user.get(ident=query.from_user.id)
-    new_trackable_product = await db.trackable_product.new_from_product(product)  # type: ignore
     trackable_products = await user.awaitable_attrs.tracks_products  # type: ignore
-    if new_trackable_product in trackable_products:
+    trackable_urls = [trackable_product.url for trackable_product in trackable_products]
+    if product.url in trackable_urls:
         await query.answer(text=Messages.ALREADY_IN_WATCHLIST)
         return
+    new_trackable_product = await db.trackable_product.new_from_product(product)  # type: ignore
     trackable_products.append(new_trackable_product)
     await query.answer(text=Messages.ADDED_TO_WATCHLIST)

@@ -4,6 +4,7 @@ from aiogram.utils.markdown import hbold, hide_link, hitalic, hlink, hstrikethro
 
 from bot.keyboards.pagination import Paginator
 from database import Product
+from database.models import TrackableProduct
 
 
 class Messages:
@@ -37,7 +38,7 @@ class Messages:
         return card
 
     @staticmethod
-    def get_watchlist(products: Sequence[Product]) -> str:
+    def get_watchlist(products: Sequence[TrackableProduct]) -> str:
         if products:
             text = "\n\n".join(
                 (

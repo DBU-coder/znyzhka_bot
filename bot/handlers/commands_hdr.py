@@ -22,5 +22,5 @@ async def cmd_help(message: types.Message):
 @router.message(Command("watchlist"))
 async def cmd_watchlist(message: types.Message, db: Database):
     user = await db.user.get(ident=message.from_user.id)  # type: ignore
-    liked_products = await user.awaitable_attrs.liked_products  # type: ignore
-    await message.answer(Messages.get_watchlist(liked_products), disable_web_page_preview=True)
+    trackable_products = await user.awaitable_attrs.tracks_products  # type: ignore
+    await message.answer(Messages.get_watchlist(trackable_products), disable_web_page_preview=True)
