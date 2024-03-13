@@ -1,7 +1,10 @@
+from asyncio import sleep
+
 from aiogram import Router, types
 from aiogram.filters import Command, CommandStart
 
 from bot.handlers.messages import Messages
+from bot.keyboards.inline import remove_from_watchlist_ikb
 from bot.keyboards.reply import select_store_kb
 from database import Database
 
@@ -23,4 +26,9 @@ async def cmd_help(message: types.Message):
 async def cmd_watchlist(message: types.Message, db: Database):
     user = await db.user.get(ident=message.from_user.id)  # type: ignore
     trackable_products = await user.awaitable_attrs.tracks_products  # type: ignore
-    await message.answer(Messages.get_watchlist(trackable_products), disable_web_page_preview=True)
+    if not trackable_products:
+        await message.answer(Messages.EMPTY_WATCHLIST)
+        return
+    for product in trackable_products:
+        await message.answer(Messages.product_card(product), reply_markup=remove_from_watchlist_ikb(product.id))
+        await sleep(1)

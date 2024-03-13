@@ -1,6 +1,4 @@
-from collections.abc import Sequence
-
-from aiogram.utils.markdown import hbold, hide_link, hitalic, hlink, hstrikethrough
+from aiogram.utils.markdown import hbold, hide_link, hitalic, hstrikethrough
 
 from bot.keyboards.pagination import Paginator
 from database import Product
@@ -16,6 +14,8 @@ class Messages:
     PRODUCTS_NOT_FOUND = "Вибачте, не знайшли жодного продукту 😔"
     ADDED_TO_WATCHLIST = "Додано до списку слідкування 📝"
     ALREADY_IN_WATCHLIST = "Ви вже слідкуєте за цим продуктом 🤩"
+    EMPTY_WATCHLIST = "Ваш список слідкування 📝 порожній. 😔"
+    REMOVED_FROM_WATCHLIST = "Ви вилучили продукт зі списку слідкування 📝"
 
     @staticmethod
     def greeting(name: str = "Незнайомець") -> str:
@@ -26,28 +26,14 @@ class Messages:
         return f'{hbold("Категорії")}\n{pagination}'
 
     @staticmethod
-    def product_card(product: Product) -> str:
+    def product_card(product: TrackableProduct | Product) -> str:
         card = (
             f"{hide_link(product.url)}\n\n{hbold(product.title)}\n"
             f"{hitalic('Стара ціна: ')}{hstrikethrough(str(product.old_price)+'₴')}\n"
             f"{hitalic('Нова ціна: ')}{hbold(str(product.price)+'₴')}\n"
-            f"{hitalic('Знижка: ')}-{product.discount_percent}%🔥🔥🔥"
         )
         if product.price_with_card:
-            card += f"\n\n{hbold('З картою АТБ')}💳: {hbold(str(product.price_with_card)+'₴')}"
+            card += f"\n{hbold('З картою АТБ')}💳: {hbold(str(product.price_with_card)+'₴')}"
+        if product.discount_percent:
+            card += f"\n{hitalic('Знижка: ')}-{product.discount_percent}%🔥🔥🔥"
         return card
-
-    @staticmethod
-    def get_watchlist(products: Sequence[TrackableProduct]) -> str:
-        if products:
-            text = "\n\n".join(
-                (
-                    f"{hlink(product.title, product.url)}\n"
-                    f"{hstrikethrough(str(product.old_price)+'₴')} | "
-                    f"{str(product.price)+'₴'} | "
-                    f"💳:{hbold(str(product.price_with_card)+'₴')}"
-                )
-                for product in products
-            )
-            return text
-        return "Ваш список слідкування 📝 порожній."

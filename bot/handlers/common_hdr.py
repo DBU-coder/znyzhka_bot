@@ -1,9 +1,10 @@
-from aiogram import Router
+from aiogram import F, Router
 from aiogram.filters import or_f
-from aiogram.types import Message
+from aiogram.types import CallbackQuery, Message
 
 from bot.filters import UrlFilter
 from bot.handlers.messages import Messages
+from bot.keyboards.inline import WatchlistCallback
 from database import Database
 from parser.watchparser import ATBSingleProductParser
 
@@ -37,3 +38,10 @@ async def add_to_watchlist(message: Message, db: Database) -> None:
     )
     trackable_products.append(new_trackable_product)
     await message.answer(Messages.ADDED_TO_WATCHLIST)
+
+
+@router.callback_query(WatchlistCallback.filter(F.action == "remove"))
+async def remove_from_watchlist(query: CallbackQuery, callback_data: WatchlistCallback, db: Database):
+    await db.user_trackable_product.remove(query.from_user.id, callback_data.product_id)
+    await query.answer(text=Messages.REMOVED_FROM_WATCHLIST)
+    await query.message.delete()  # type: ignore

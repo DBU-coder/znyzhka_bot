@@ -28,3 +28,16 @@ def add_to_watchlist_ikb(product_id: int) -> InlineKeyboardMarkup:
             ]
         ]
     )
+
+
+def remove_from_watchlist_ikb(product_id: int) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="Remove from watchlist",
+                    callback_data=WatchlistCallback(action="remove", product_id=product_id).pack(),
+                )
+            ]
+        ]
+    )
