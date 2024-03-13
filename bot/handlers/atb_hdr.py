@@ -62,7 +62,7 @@ async def add_to_watchlist(query: CallbackQuery, callback_data: WatchlistCallbac
     user = await db.user.get(ident=query.from_user.id)
     trackable_products = await user.awaitable_attrs.tracks_products  # type: ignore
     trackable_urls = [trackable_product.url for trackable_product in trackable_products]
-    if product.url in trackable_urls:
+    if product.url in trackable_urls:  # type: ignore
         await query.answer(text=Messages.ALREADY_IN_WATCHLIST)
         return
     new_trackable_product = await db.trackable_product.new_from_product(product)  # type: ignore

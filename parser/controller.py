@@ -25,7 +25,6 @@ async def parse_products(db: Database) -> None:
             "old_price": item.old_price,
             "price_with_card": item.price_with_card,
             "discount_percent": item.discount_percent,
-            "in_wishlist": False,
             "category_id": category_urls_to_id[item.cat_url],
         }
         for item in data

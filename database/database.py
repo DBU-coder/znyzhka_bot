@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import (
 
 from database.repositories import CategoryRepository, ProductRepository, UserRepository
 from database.repositories.trackable_product import TrackableProductRepository
+from database.repositories.user_trackable_product import UserTrackableProductRepository
 
 
 @event.listens_for(Engine, "connect")
@@ -44,3 +45,4 @@ class Database:
         self.product = ProductRepository(session=session)
         self.category = CategoryRepository(session=session)
         self.trackable_product = TrackableProductRepository(session=session)
+        self.user_trackable_product = UserTrackableProductRepository(session=session)
