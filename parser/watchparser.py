@@ -9,12 +9,11 @@ from requests_html import HTML, AsyncHTMLSession
 from bot.data_structure import ParsedProduct
 
 
-class BaseSingleProductParser(ABC):
-    _HEADERS: ClassVar[dict[str, str | int]] = {
-        "Accept": "text/html,application/xhtml+xml,application/xml;\
-            q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
-    }
-    url: str = ""
+class BaseProductParser(ABC):
+    _HEADERS: ClassVar[dict[str, str | int]]
+
+    def __init__(self, urls: list[str]):
+        self.urls = urls
 
     def __new__(cls, *args, **kwargs):
         cls._HEADERS["User-Agent"] = UserAgent().random
@@ -24,19 +23,24 @@ class BaseSingleProductParser(ABC):
     @abstractmethod
     async def _parse_product(response: Response) -> ParsedProduct: ...
 
-    async def __get_product_data(self):
-        session = AsyncHTMLSession()
-        response = await session.get(self.url, headers=self._HEADERS)
+    async def __get_page_data(self, session: AsyncHTMLSession, url: str) -> ParsedProduct:
+        response = await session.get(url, headers=self._HEADERS)
         return await self._parse_product(response)
 
-    async def get_product(self):
-        return await asyncio.create_task(self.__get_product_data())
+    async def get_products(self):
+        session = AsyncHTMLSession()
+        tasks = [self.__get_page_data(session, url) for url in self.urls]
+        return await asyncio.gather(*tasks)
 
 
-class ATBSingleProductParser(BaseSingleProductParser):
+class ATBProductParser(BaseProductParser):
+    _HEADERS: ClassVar[dict[str, str | int]] = {
+        "Accept": "text/html,application/xhtml+xml,application/xml;\
+            q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+    }
 
-    def __init__(self, url: str):
-        self.url = url
+    def __init__(self, urls: list[str]):
+        super().__init__(urls)
 
     @staticmethod
     async def _parse_product(response: Response) -> ParsedProduct:
@@ -48,7 +52,7 @@ class ATBSingleProductParser(BaseSingleProductParser):
             "span", first=True, containing="%"
         )
 
-        product = ParsedProduct(
+        return ParsedProduct(
             title=page.find("h1.page-title", first=True).text,
             image=page.find("div.cardproduct-tabs__item", first=True).find("img", first=True).attrs["src"],
             url=response.url,
@@ -58,4 +62,3 @@ class ATBSingleProductParser(BaseSingleProductParser):
             discount_percent=int(discount_percent_block.text[1:-1]) if discount_percent_block else None,
             cat_url=None,
         )
-        return product

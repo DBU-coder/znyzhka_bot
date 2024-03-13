@@ -10,8 +10,8 @@ class UserTrackableProductRepository(Repository[UserTrackableProduct]):
     def __init__(self, session: AsyncSession):
         super().__init__(type_model=UserTrackableProduct, session=session)
 
-    def new(self, user_id: int, product_id: int):
-        self.session.merge(UserTrackableProduct(user_id=user_id, trackable_product_id=product_id))
+    async def new(self, user_id: int, product_id: int):
+        await self.session.merge(UserTrackableProduct(user_id=user_id, trackable_product_id=product_id))
 
     async def remove(self, user_id: int, product_id: int):
         await self.delete(

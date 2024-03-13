@@ -6,7 +6,7 @@ from bot.filters import UrlFilter
 from bot.handlers.messages import Messages
 from bot.keyboards.inline import WatchlistCallback
 from database import Database
-from parser.watchparser import ATBSingleProductParser
+from parser.watchparser import ATBProductParser
 
 router = Router(name=__name__)
 
@@ -18,8 +18,9 @@ router = Router(name=__name__)
     )
 )
 async def add_to_watchlist(message: Message, db: Database) -> None:
-    parser = ATBSingleProductParser(url=message.text)  # type: ignore
-    parsed_product = await parser.get_product()
+    parser = ATBProductParser(urls=[message.text])  # type: ignore
+    parsed_products = await parser.get_products()
+    parsed_product = parsed_products[0]
     user = await db.user.get(ident=message.from_user.id)  # type: ignore
     trackable_products = await user.awaitable_attrs.tracks_products  # type: ignore
     trackable_urls = [trackable_product.url for trackable_product in trackable_products]
