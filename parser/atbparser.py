@@ -9,7 +9,7 @@ from requests_html import HTML, AsyncHTMLSession
 from bot.data_structure import ParsedCategory, ParsedProduct
 
 
-class ATBProductParser:
+class ATBCategoryProductsParser:
     _PRODUCT_PER_PAGE: ClassVar[int] = 36
     _HEADERS: ClassVar[dict[str, str | int]] = {
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;\

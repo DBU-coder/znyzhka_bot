@@ -1,3 +1,4 @@
+from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import Product, TrackableProduct
@@ -45,3 +46,14 @@ class TrackableProductRepository(Repository[TrackableProduct]):
             )
         )
         return new_product
+
+    async def update(self, data: dict):
+        statement = insert(self.type_model).on_conflict_do_update(
+            set_=dict(
+                price=data["price"],
+                price_with_card=data["price_with_card"],
+                old_price=data["old_price"],
+                discount_percent=data["discount_percent"],
+            ),
+        )
+        await self.session.execute(statement, data)

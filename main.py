@@ -13,8 +13,8 @@ from database.models import process_scheme
 from parser.schedule import start_parser_schedule
 
 
-async def set_up_parser(session_maker: async_sessionmaker) -> None:
-    await start_parser_schedule(session_maker)
+async def set_up_parser(session_maker: async_sessionmaker, bot) -> None:
+    await start_parser_schedule(session_maker, bot)
 
 
 async def starting_bot():
@@ -36,7 +36,7 @@ async def starting_bot():
     engine = create_engine(db_url)
     session_maker = create_session_maker(engine)
     await process_scheme(engine)
-    await set_up_parser(session_maker)
+    await set_up_parser(session_maker, bot)
 
     await dp.start_polling(
         bot,
