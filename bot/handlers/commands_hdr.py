@@ -30,5 +30,8 @@ async def cmd_watchlist(message: types.Message, db: Database):
         await message.answer(Messages.EMPTY_WATCHLIST)
         return
     for product in trackable_products:
-        await message.answer(Messages.product_card(product), reply_markup=remove_from_watchlist_ikb(product.id))
+        await message.answer(
+            Messages.product_card(product),
+            reply_markup=remove_from_watchlist_ikb(product.id),
+        )
         await sleep(1)

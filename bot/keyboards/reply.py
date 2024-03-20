@@ -11,4 +11,6 @@ def select_store_kb(**kwargs) -> ReplyKeyboardMarkup:
         KeyboardButton(text="Обрані товари"),
     )
     builder.adjust(3, 1)
-    return builder.as_markup(resize_keyboard=True, input_field_placeholder="Назва мережі", **kwargs)
+    return builder.as_markup(
+        resize_keyboard=True, input_field_placeholder="Назва мережі", **kwargs
+    )

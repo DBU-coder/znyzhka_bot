@@ -1,5 +1,6 @@
-from aiogram.utils.markdown import hbold, hide_link, hitalic, hstrikethrough
+from aiogram.utils.markdown import hbold, hide_link, hitalic, hlink, hstrikethrough
 
+from bot.data_structure import ParsedProduct
 from bot.keyboards.pagination import Paginator
 from database import Product
 from database.models import TrackableProduct
@@ -37,3 +38,45 @@ class Messages:
         if product.discount_percent:
             card += f"\n{hitalic('Знижка: ')}-{product.discount_percent}%🔥🔥🔥"
         return card
+
+    @staticmethod
+    def price_notification(
+        trackable_product: TrackableProduct, parsed_product: ParsedProduct
+    ) -> str:
+        message = (
+            f"{'🟢' if parsed_product.price < trackable_product.price or parsed_product.price_with_card else '🔴'}"  # type: ignore
+            f"Ціна на {hlink(trackable_product.title, trackable_product.url)} змінилась!\n\n"
+            f"{hitalic('Стара ціна: ')}{hstrikethrough(str(trackable_product.price) + '₴')}\n"
+            f"{hitalic('Нова ціна: ')}{hbold(str(parsed_product.price)+'₴')}\n"
+        )
+        if trackable_product.price_with_card and parsed_product.price_with_card:
+            message += (
+                f"З картою стара💳: {str(trackable_product.price_with_card) + '₴'}\n"
+            )
+        elif parsed_product.price_with_card:
+            message += f"{hbold('З картою')}💳: {hbold(str(parsed_product.price_with_card)+'₴')}\n"
+        elif parsed_product.discount_percent:
+            message += f"{hitalic('Знижка: ')}-{parsed_product.discount_percent}%🔥🔥🔥"
+        return message
+
+    @staticmethod
+    def out_of_stock_notification(trackable_product: TrackableProduct) -> str:
+        return (
+            f"Товар {hlink(trackable_product.title, trackable_product.url)} закінчився!"
+        )
+
+    @staticmethod
+    def in_stock_notification(
+        trackable_product: TrackableProduct, parsed_product: ParsedProduct
+    ) -> str:
+        message = (
+            f"Товар {hlink(trackable_product.title, trackable_product.url)} в наявності!\n\n"
+            f"{hitalic('Ціна: ')}{hbold(str(parsed_product.price) + '₴')}"
+        )
+        if parsed_product.price_with_card:
+            message += f"\n{hbold('З картою')}💳: {hbold(str(parsed_product.price_with_card) + '₴')}"
+        if parsed_product.discount_percent:
+            message += (
+                f"\n{hitalic('Знижка: ')}-{parsed_product.discount_percent}%🔥🔥🔥"
+            )
+        return message

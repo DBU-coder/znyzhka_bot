@@ -29,11 +29,24 @@ class ATBCategoryProductsParser:
         product = ParsedProduct(
             title=title_block.text.strip(),
             image=product_card.find("img", first=True).attrs["src"],
-            url="https://www.atbmarket.com" + title_block.find("a", first=True).attrs["href"],
-            price=float(product_card.find("data.product-price__top", first=True).attrs["value"]),
-            old_price=float(product_card.find("data.product-price__bottom", first=True).attrs["value"]),
-            discount_percent=int(product_card.find("span.custom-product-label", first=True, containing="%").text[1:-1]),
-            price_with_card=float(with_card_price.attrs["value"]) if with_card_price else None,
+            url="https://www.atbmarket.com"
+            + title_block.find("a", first=True).attrs["href"],
+            price=float(
+                product_card.find("data.product-price__top", first=True).attrs["value"]
+            ),
+            old_price=float(
+                product_card.find("data.product-price__bottom", first=True).attrs[
+                    "value"
+                ]
+            ),
+            discount_percent=int(
+                product_card.find(
+                    "span.custom-product-label", first=True, containing="%"
+                ).text[1:-1]
+            ),
+            price_with_card=(
+                float(with_card_price.attrs["value"]) if with_card_price else None
+            ),
             cat_url=cat_url,
         )
         return product
@@ -42,14 +55,18 @@ class ATBCategoryProductsParser:
         cards = response.html.find("article.catalog-item")  # type: ignore
         page_data = []
         for card in cards:
-            discount_block = card.find("span.custom-product-label", first=True, containing="%")
+            discount_block = card.find(
+                "span.custom-product-label", first=True, containing="%"
+            )
             if discount_block:
                 cat_url = response.url.split("&")[0]
                 product_data = self._parse_product_data(card, cat_url)
                 page_data.append(product_data)
         return page_data
 
-    async def _fetch_page_data(self, session: AsyncHTMLSession, url: str, **params) -> list[ParsedProduct]:
+    async def _fetch_page_data(
+        self, session: AsyncHTMLSession, url: str, **params
+    ) -> list[ParsedProduct]:
         response = await session.get(url, headers=self._HEADERS, params=params)
         print(url)
         return await self._parse_product_cards(response)
@@ -62,7 +79,9 @@ class ATBCategoryProductsParser:
             pages = self._get_pagination(response)
             if pages > 1:
                 for page in range(2, pages + 1):
-                    tasks.append(self._fetch_page_data(session, url, params={"page": page}))
+                    tasks.append(
+                        self._fetch_page_data(session, url, params={"page": page})
+                    )
             tasks.append(self._parse_product_cards(response))
         pages_data_list = await gather(*tasks)
         all_data = []
@@ -90,7 +109,9 @@ class ATBCategoryParser:
         categories = response.html.find("div.catalog-subcategory-list", first=True)
         return list(categories.absolute_links)[:3]
 
-    async def parse_category_products(self, session: AsyncHTMLSession, url: str) -> ParsedCategory:
+    async def parse_category_products(
+        self, session: AsyncHTMLSession, url: str
+    ) -> ParsedCategory:
         response = await session.get(url, headers=self._HEADERS)
         title = response.html.find("span.custom-tag--white-active", first=True).text
         print(title)

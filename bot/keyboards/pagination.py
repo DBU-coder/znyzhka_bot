@@ -11,7 +11,11 @@ class NavigationCallback(CallbackData, prefix="navigation"):
 
 
 class Paginator:
-    def __init__(self, buttons: list[InlineKeyboardButton] | None = None, buttons_on_page: int = 3) -> None:
+    def __init__(
+        self,
+        buttons: list[InlineKeyboardButton] | None = None,
+        buttons_on_page: int = 3,
+    ) -> None:
         self.buttons = buttons or []
         self.__buttons_on_page = buttons_on_page
         self.__current_page = 0
@@ -24,14 +28,22 @@ class Paginator:
         builder.adjust(1, repeat=True)
 
         prev_button = InlineKeyboardButton(
-            text="<", callback_data=NavigationCallback(action="navigate", direction="previous").pack()
+            text="<",
+            callback_data=NavigationCallback(
+                action="navigate", direction="previous"
+            ).pack(),
         )
         next_button = InlineKeyboardButton(
-            text=">", callback_data=NavigationCallback(action="navigate", direction="next").pack()
+            text=">",
+            callback_data=NavigationCallback(
+                action="navigate", direction="next"
+            ).pack(),
         )
         current_page = InlineKeyboardButton(
             text=f"{self.__current_page + 1}/{self.__total_pages()}",
-            callback_data=NavigationCallback(action="navigate", direction="first").pack(),
+            callback_data=NavigationCallback(
+                action="navigate", direction="first"
+            ).pack(),
         )
 
         if from_ <= 0:

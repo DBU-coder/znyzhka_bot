@@ -15,11 +15,11 @@ class ParsedProduct(NamedTuple):
     title: str
     image: str | None
     url: str
-    price: float
+    price: float | None
     old_price: float | None
     price_with_card: float | None
     discount_percent: int | None
-    cat_url: str | None
+    cat_url: str | None = None
 
 
 class ParsedCategory(TypedDict):

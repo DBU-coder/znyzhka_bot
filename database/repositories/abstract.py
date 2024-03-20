@@ -33,9 +33,13 @@ class Repository(Generic[AbstractModel], ABC):
         result = await self.session.scalars(statement)
         return result.one_or_none()
 
-    async def get_many(self, where_clause=None, limit: int | None = None, order_by=None) -> Sequence[AbstractModel]:
+    async def get_many(
+        self, where_clause=None, limit: int | None = None, order_by=None
+    ) -> Sequence[AbstractModel]:
         statement = select(self.type_model)
-        statement = statement.where(where_clause) if where_clause is not None else statement
+        statement = (
+            statement.where(where_clause) if where_clause is not None else statement
+        )
         statement = statement.limit(limit).order_by(order_by)
         result = await self.session.scalars(statement)
         return result.all()

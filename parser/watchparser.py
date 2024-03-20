@@ -23,7 +23,9 @@ class BaseProductParser(ABC):
     @abstractmethod
     async def _parse_product(response: Response) -> ParsedProduct: ...
 
-    async def __get_page_data(self, session: AsyncHTMLSession, url: str) -> ParsedProduct:
+    async def __get_page_data(
+        self, session: AsyncHTMLSession, url: str
+    ) -> ParsedProduct:
         response = await session.get(url, headers=self._HEADERS)
         return await self._parse_product(response)
 
@@ -45,20 +47,46 @@ class ATBProductParser(BaseProductParser):
     @staticmethod
     async def _parse_product(response: Response) -> ParsedProduct:
         page: HTML = response.html  # type: ignore
-        __price_block = page.find("div.product-about__buy-row", first=True)
-        old_price_block = __price_block.find("data.product-price__bottom", first=True)
-        price_with_card_block = __price_block.find("data.atbcard-sale__price-top", first=True)
-        discount_percent_block = page.find("div.product-about__labels", first=True).find(
-            "span", first=True, containing="%"
+        title = page.find("h1.page-title", first=True).text
+        image = (
+            page.find("div.cardproduct-tabs__item", first=True)
+            .find("img", first=True)
+            .attrs["src"]
         )
+        url = response.url
+        if price_block := page.find("div.product-about__buy-row", first=True):
+            current_price = price_block.find(
+                "data.product-price__top", first=True
+            ).find("span", first=True)
+            old_price = price_block.find("data.product-price__bottom", first=True)
+            price_with_card = price_block.find(
+                "data.atbcard-sale__price-top", first=True
+            )
 
+            discount_percent_block = page.find(
+                "div.product-about__labels", first=True
+            ).find("span", first=True, containing="%")
+            return ParsedProduct(
+                title=title,
+                image=image,
+                url=url,
+                price=float(current_price.text),
+                old_price=float(old_price.text) if old_price else None,
+                price_with_card=(
+                    float(price_with_card.attrs["value"]) if price_with_card else None
+                ),
+                discount_percent=(
+                    int(discount_percent_block.text[1:-1])
+                    if discount_percent_block
+                    else None
+                ),
+            )
         return ParsedProduct(
-            title=page.find("h1.page-title", first=True).text,
-            image=page.find("div.cardproduct-tabs__item", first=True).find("img", first=True).attrs["src"],
-            url=response.url,
-            price=float(page.find("data.product-price__top", first=True).find("span", first=True).text),
-            old_price=float(old_price_block.text) if old_price_block else None,
-            price_with_card=float(price_with_card_block.attrs["value"]) if price_with_card_block else None,
-            discount_percent=int(discount_percent_block.text[1:-1]) if discount_percent_block else None,
-            cat_url=None,
+            title=title,
+            image=image,
+            url=url,
+            price=None,
+            old_price=None,
+            price_with_card=None,
+            discount_percent=None,
         )

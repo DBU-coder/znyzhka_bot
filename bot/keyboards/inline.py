@@ -13,7 +13,9 @@ class WatchlistCallback(CallbackData, prefix="watchlist"):
 
 def get_category_buttons(categories: Sequence[Category]) -> list[InlineKeyboardButton]:
     return [
-        InlineKeyboardButton(text=category.title[:30], callback_data=f"category_{category.id}")
+        InlineKeyboardButton(
+            text=category.title[:30], callback_data=f"category_{category.id}"
+        )
         for category in categories
     ]
 
@@ -23,7 +25,10 @@ def add_to_watchlist_ikb(product_id: int) -> InlineKeyboardMarkup:
         inline_keyboard=[
             [
                 InlineKeyboardButton(
-                    text="Add to watchlist", callback_data=WatchlistCallback(action="add", product_id=product_id).pack()
+                    text="Add to watchlist",
+                    callback_data=WatchlistCallback(
+                        action="add", product_id=product_id
+                    ).pack(),
                 )
             ]
         ]
@@ -36,7 +41,9 @@ def remove_from_watchlist_ikb(product_id: int) -> InlineKeyboardMarkup:
             [
                 InlineKeyboardButton(
                     text="Remove from watchlist",
-                    callback_data=WatchlistCallback(action="remove", product_id=product_id).pack(),
+                    callback_data=WatchlistCallback(
+                        action="remove", product_id=product_id
+                    ).pack(),
                 )
             ]
         ]

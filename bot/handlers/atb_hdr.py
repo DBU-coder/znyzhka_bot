@@ -20,7 +20,9 @@ pagination = Paginator(buttons_on_page=10)
 async def cmd_atb(message: Message, db: Database):
     categories = await db.category.get_many(order_by=Category.title.asc())
     pagination.buttons = get_category_buttons(categories)
-    await message.answer(Messages.category_menu(pagination), reply_markup=await pagination.update_kb())
+    await message.answer(
+        Messages.category_menu(pagination), reply_markup=await pagination.update_kb()
+    )
 
 
 @router.callback_query(NavigationCallback.filter(F.direction == "next"))
@@ -39,7 +41,8 @@ async def prev_(query: CallbackQuery) -> None:
 async def first_(query: CallbackQuery) -> None:
     await pagination.on_first()
     await query.message.edit_text(  # type: ignore
-        text=Messages.category_menu(pagination), reply_markup=await pagination.update_kb()
+        text=Messages.category_menu(pagination),
+        reply_markup=await pagination.update_kb(),
     )
 
 
@@ -57,7 +60,9 @@ async def category_products(query: CallbackQuery, db: Database) -> None:
 
 
 @router.callback_query(WatchlistCallback.filter(F.action == "add"))
-async def add_to_watchlist(query: CallbackQuery, callback_data: WatchlistCallback, db: Database) -> None:
+async def add_to_watchlist(
+    query: CallbackQuery, callback_data: WatchlistCallback, db: Database
+) -> None:
     product = await db.product.get(ident=callback_data.product_id)
     user = await db.user.get(ident=query.from_user.id)
     trackable_products = await user.awaitable_attrs.tracks_products  # type: ignore

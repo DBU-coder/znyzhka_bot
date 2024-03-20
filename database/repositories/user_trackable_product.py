@@ -11,17 +11,24 @@ class UserTrackableProductRepository(Repository[UserTrackableProduct]):
         super().__init__(type_model=UserTrackableProduct, session=session)
 
     async def new(self, user_id: int, product_id: int):
-        await self.session.merge(UserTrackableProduct(user_id=user_id, trackable_product_id=product_id))
+        await self.session.merge(
+            UserTrackableProduct(user_id=user_id, trackable_product_id=product_id)
+        )
 
     async def remove(self, user_id: int, product_id: int):
         await self.delete(
-            and_(UserTrackableProduct.user_id == user_id, UserTrackableProduct.trackable_product_id == product_id)
+            and_(
+                UserTrackableProduct.user_id == user_id,
+                UserTrackableProduct.trackable_product_id == product_id,
+            )
         )
         await self.__delete_unused()
 
     async def __delete_unused(self):
         stmt = delete(TrackableProduct).where(
-            TrackableProduct.id.not_in(select(UserTrackableProduct.trackable_product_id).scalar_subquery())
+            TrackableProduct.id.not_in(
+                select(UserTrackableProduct.trackable_product_id).scalar_subquery()
+            )
         )
         await self.session.execute(stmt)
 

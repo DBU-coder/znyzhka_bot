@@ -26,7 +26,9 @@ class BaseModel(AsyncAttrs, DeclarativeBase):
     }
 
     def __repr__(self):
-        columns = [f"{col}={getattr(self, col)}" for col in self.__table__.columns.keys()]
+        columns = [
+            f"{col}={getattr(self, col)}" for col in self.__table__.columns.keys()
+        ]
         return f"<{self.__class__.__name__}({', '.join(columns)})>"
 
 
@@ -48,11 +50,13 @@ class Product(BaseModel):
     title: Mapped[str_256]
     image: Mapped[str | None]
     url: Mapped[str_unique]
-    price: Mapped[float]
+    price: Mapped[float | None]
     old_price: Mapped[float | None]
     price_with_card: Mapped[float | None]
     discount_percent: Mapped[int | None]
-    category_id: Mapped[int] = mapped_column(ForeignKey("category.id", ondelete="CASCADE"))
+    category_id: Mapped[int] = mapped_column(
+        ForeignKey("category.id", ondelete="CASCADE")
+    )
 
     category: Mapped["Category"] = relationship(back_populates="products")
 
@@ -64,12 +68,14 @@ class TrackableProduct(BaseModel):
     title: Mapped[str_256]
     image: Mapped[str | None]
     url: Mapped[str_unique]
-    price: Mapped[float]
+    price: Mapped[float | None]
     old_price: Mapped[float | None]
     price_with_card: Mapped[float | None]
     discount_percent: Mapped[int | None]
 
-    users: Mapped[list[User]] = relationship(secondary="user_trackable_product", back_populates="tracks_products")
+    users: Mapped[list[User]] = relationship(
+        secondary="user_trackable_product", back_populates="tracks_products"
+    )
 
 
 class Category(BaseModel):
@@ -87,7 +93,9 @@ class Category(BaseModel):
 class UserTrackableProduct(BaseModel):
     __tablename__ = "user_trackable_product"
 
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.tg_id", ondelete="CASCADE"), primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("user.tg_id", ondelete="CASCADE"), primary_key=True
+    )
     trackable_product_id: Mapped[int] = mapped_column(
         ForeignKey("trackable_product.id", ondelete="CASCADE"), primary_key=True
     )

@@ -42,7 +42,9 @@ async def add_to_watchlist(message: Message, db: Database) -> None:
 
 
 @router.callback_query(WatchlistCallback.filter(F.action == "remove"))
-async def remove_from_watchlist(query: CallbackQuery, callback_data: WatchlistCallback, db: Database):
+async def remove_from_watchlist(
+    query: CallbackQuery, callback_data: WatchlistCallback, db: Database
+):
     await db.user_trackable_product.remove(query.from_user.id, callback_data.product_id)
     await query.answer(text=Messages.REMOVED_FROM_WATCHLIST)
     await query.message.delete()  # type: ignore
