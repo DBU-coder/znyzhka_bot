@@ -1,8 +1,8 @@
 from sqlalchemy import and_, delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.models import TrackableProduct, UserTrackableProduct
-from database.repositories.abstract import Repository
+from src.database.models import TrackableProduct, UserTrackableProduct
+from src.database.repositories.abstract import Repository
 
 
 class UserTrackableProductRepository(Repository[UserTrackableProduct]):

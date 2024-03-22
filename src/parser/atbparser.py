@@ -6,7 +6,7 @@ from fake_useragent import UserAgent
 from requests import Response
 from requests_html import HTML, AsyncHTMLSession
 
-from bot.data_structure import ParsedCategory, ParsedProduct
+from src.bot.data_structure import ParsedCategory, ParsedProduct
 
 
 class ATBCategoryProductsParser:
@@ -107,7 +107,7 @@ class ATBCategoryParser:
     async def get_categories_links(self, session: AsyncHTMLSession) -> list:
         response = await session.get(url=self._URL, headers=self._HEADERS)
         categories = response.html.find("div.catalog-subcategory-list", first=True)
-        return list(categories.absolute_links)[:3]
+        return categories.absolute_links
 
     async def parse_category_products(
         self, session: AsyncHTMLSession, url: str

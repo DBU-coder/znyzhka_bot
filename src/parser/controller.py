@@ -1,9 +1,9 @@
 from aiogram import Bot
 
-from bot.data_structure import ParsedProduct
-from bot.handlers.messages import Messages
-from database import Category, Database
-from database.models import TrackableProduct, User
+from src.bot.data_structure import ParsedProduct
+from src.bot.handlers.messages import Messages
+from src.database import Category, Database
+from src.database.models import TrackableProduct
 
 from .atbparser import ATBCategoryParser, ATBCategoryProductsParser
 from .watchparser import ATBProductParser
@@ -39,38 +39,37 @@ async def parse_products(db: Database) -> None:
 
 
 async def update_trackable_products(db: Database, bot: Bot):
-    trackable_products = await db.trackable_product.get_many()
-    urls = [prod.url for prod in trackable_products]
-    parser = ATBProductParser(urls)
-    parsed_products: list[ParsedProduct] = await parser.get_products()
-
+    parsed_products = await parse_new_product_data(db)
     for parsed_product in parsed_products:
         trackable_product = await db.trackable_product.get_by_where(
             TrackableProduct.url == parsed_product.url
         )
-        if (
-            parsed_product.price is None and trackable_product.price is not None  # type: ignore
-        ):
-            await _send_stock_notification(bot, trackable_product, parsed_product, out_of_stock=True)  # type: ignore
-            await db.trackable_product.update(parsed_product._asdict())
-        elif (
-            trackable_product.price is None and parsed_product.price is not None  # type: ignore
-        ):
-            await _send_stock_notification(bot, trackable_product, parsed_product, out_of_stock=False)  # type: ignore
+        if (parsed_product.price is None) != (trackable_product.price is None):  # type: ignore
+            out_of_stock = parsed_product.price is None
+            await _send_stock_notification(
+                bot, trackable_product, parsed_product, out_of_stock  # type: ignore
+            )
             await db.trackable_product.update(parsed_product._asdict())
         elif (
             parsed_product.price != trackable_product.price  # type: ignore
             or parsed_product.price_with_card != trackable_product.price_with_card  # type: ignore
         ):
-            await _send_change_price_notification(bot, trackable_product, parsed_product)  # type: ignore
+            await _send_change_price_notification(
+                bot, trackable_product, parsed_product  # type: ignore
+            )
             await db.trackable_product.update(parsed_product._asdict())
+
+
+async def parse_new_product_data(db: Database) -> list[ParsedProduct]:
+    parser = ATBProductParser(urls=await db.trackable_product.get_urls())
+    return await parser.get_products()
 
 
 async def _send_change_price_notification(
     bot: Bot, trackable_product: TrackableProduct, parsed_product: ParsedProduct
 ):
     users = await trackable_product.awaitable_attrs.users
-    await _send_messages_to_users(
+    await Messages.send_message_to_users(
         bot,
         users,
         message=Messages.price_notification(trackable_product, parsed_product),
@@ -88,9 +87,4 @@ async def _send_stock_notification(
         message = Messages.out_of_stock_notification(trackable_product)
     else:
         message = Messages.in_stock_notification(trackable_product, parsed_product)
-    await _send_messages_to_users(bot, users, message)
-
-
-async def _send_messages_to_users(bot: Bot, users: list[User], message: str):
-    for user in users:
-        await bot.send_message(user.tg_id, message)
+    await Messages.send_message_to_users(bot, users, message)

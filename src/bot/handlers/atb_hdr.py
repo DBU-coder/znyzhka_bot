@@ -3,14 +3,14 @@ import asyncio
 from aiogram import F, Router
 from aiogram.types import CallbackQuery, Message
 
-from bot.handlers.messages import Messages
-from bot.keyboards.inline import (
+from src.bot.handlers.messages import Messages
+from src.bot.keyboards.inline import (
     WatchlistCallback,
     add_to_watchlist_ikb,
     get_category_buttons,
 )
-from bot.keyboards.pagination import NavigationCallback, Paginator
-from database import Category, Database
+from src.bot.keyboards.pagination import NavigationCallback, Paginator
+from src.database import Category, Database
 
 router = Router(name=__name__)
 pagination = Paginator(buttons_on_page=10)

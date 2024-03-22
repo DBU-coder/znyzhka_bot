@@ -1,7 +1,7 @@
 from aiogram import Dispatcher
 from aiogram.types import BotCommand
 
-from bot.middlewares import DatabaseMiddleware, RegisterUserMiddleware
+from src.bot.middlewares import DatabaseMiddleware, RegisterUserMiddleware
 
 from .atb_hdr import router as atb_router
 from .commands_hdr import router as commands_router

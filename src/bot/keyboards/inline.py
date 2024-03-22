@@ -3,7 +3,7 @@ from collections.abc import Sequence
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from database import Category
+from src.database import Category
 
 
 class WatchlistCallback(CallbackData, prefix="watchlist"):

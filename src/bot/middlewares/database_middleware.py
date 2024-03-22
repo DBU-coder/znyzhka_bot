@@ -4,7 +4,7 @@ from typing import Any
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 
-from database import Database
+from src.database import Database
 
 
 class DatabaseMiddleware(BaseMiddleware):

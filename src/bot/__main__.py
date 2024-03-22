@@ -5,12 +5,12 @@ from aiogram.client.default import DefaultBotProperties
 from loguru import logger
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from bot.data_structure import ContextData
-from bot.handlers.controller import bot_commands, register_handlers
-from config import configure
-from database import create_engine, create_session_maker
-from database.models import process_scheme
-from parser.schedule import start_parser_schedule
+from src.bot.data_structure import ContextData
+from src.bot.handlers.controller import bot_commands, register_handlers
+from src.config import configure
+from src.database import create_engine, create_session_maker
+from src.database.models import process_scheme
+from src.parser.schedule import start_parser_schedule
 
 
 async def set_up_parser(session_maker: async_sessionmaker, bot) -> None:

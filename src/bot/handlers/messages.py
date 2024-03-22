@@ -1,9 +1,10 @@
+from aiogram import Bot
 from aiogram.utils.markdown import hbold, hide_link, hitalic, hlink, hstrikethrough
 
-from bot.data_structure import ParsedProduct
-from bot.keyboards.pagination import Paginator
-from database import Product
-from database.models import TrackableProduct
+from src.bot.data_structure import ParsedProduct
+from src.bot.keyboards.pagination import Paginator
+from src.database import Product
+from src.database.models import TrackableProduct, User
 
 
 class Messages:
@@ -80,3 +81,8 @@ class Messages:
                 f"\n{hitalic('Знижка: ')}-{parsed_product.discount_percent}%🔥🔥🔥"
             )
         return message
+
+    @staticmethod
+    async def send_message_to_users(bot: Bot, users: list[User], message: str):
+        for user in users:
+            await bot.send_message(user.tg_id, message)

@@ -4,7 +4,7 @@ from typing import Any
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 
-from database import User
+from src.database import User
 
 
 class RegisterUserMiddleware(BaseMiddleware):

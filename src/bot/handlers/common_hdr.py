@@ -2,11 +2,11 @@ from aiogram import F, Router
 from aiogram.filters import or_f
 from aiogram.types import CallbackQuery, Message
 
-from bot.filters import UrlFilter
-from bot.handlers.messages import Messages
-from bot.keyboards.inline import WatchlistCallback
-from database import Database
-from parser.watchparser import ATBProductParser
+from src.bot.filters import UrlFilter
+from src.bot.handlers.messages import Messages
+from src.bot.keyboards.inline import WatchlistCallback
+from src.database import Database
+from src.parser.watchparser import ATBProductParser
 
 router = Router(name=__name__)
 

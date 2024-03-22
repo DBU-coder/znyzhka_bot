@@ -3,7 +3,7 @@ from typing import NamedTuple, TypedDict
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database import Database
+from src.database import Database
 
 
 class ContextData(TypedDict):

@@ -4,7 +4,7 @@ services:
   app:
     build: .
     container_name: bot
-    command: python main.py
+    command: python __main__.py
     volumes:
       - ./:/app
     env_file:

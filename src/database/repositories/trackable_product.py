@@ -1,8 +1,9 @@
+from sqlalchemy import select
 from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.models import Product, TrackableProduct
-from database.repositories.abstract import Repository
+from src.database.models import Product, TrackableProduct
+from src.database.repositories.abstract import Repository
 
 
 class TrackableProductRepository(Repository[TrackableProduct]):
@@ -57,3 +58,6 @@ class TrackableProductRepository(Repository[TrackableProduct]):
             ),
         )
         await self.session.execute(statement, data)
+
+    async def get_urls(self):
+        return await self.session.scalars(select(self.type_model.url))

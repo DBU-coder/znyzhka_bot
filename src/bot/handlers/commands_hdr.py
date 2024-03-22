@@ -3,10 +3,10 @@ from asyncio import sleep
 from aiogram import Router, types
 from aiogram.filters import Command, CommandStart
 
-from bot.handlers.messages import Messages
-from bot.keyboards.inline import remove_from_watchlist_ikb
-from bot.keyboards.reply import select_store_kb
-from database import Database
+from src.bot.handlers.messages import Messages
+from src.bot.keyboards.inline import remove_from_watchlist_ikb
+from src.bot.keyboards.reply import select_store_kb
+from src.database import Database
 
 router = Router(name=__name__)
 
