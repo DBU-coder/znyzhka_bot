@@ -1,4 +1,4 @@
-from sqlalchemy import URL, Engine, event
+from sqlalchemy import URL
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -15,17 +15,6 @@ from src.database.repositories.trackable_product import TrackableProductReposito
 from src.database.repositories.user_trackable_product import (
     UserTrackableProductRepository,
 )
-
-
-@event.listens_for(Engine, "connect")
-def set_sqlite_pragma(dbapi_connection, _):
-    """
-    Enable foreign key support in SQLite.
-    https://docs.sqlalchemy.org/en/20/dialects/sqlite.html#sqlite-foreign-keys
-    """
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA foreign_keys=ON")
-    cursor.close()
 
 
 def create_engine(url: URL | str) -> AsyncEngine:

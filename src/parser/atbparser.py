@@ -107,7 +107,7 @@ class ATBCategoryParser:
     async def get_categories_links(self, session: AsyncHTMLSession) -> list:
         response = await session.get(url=self._URL, headers=self._HEADERS)
         categories = response.html.find("div.catalog-subcategory-list", first=True)
-        return categories.absolute_links
+        return list(categories.absolute_links)[:3]
 
     async def parse_category_products(
         self, session: AsyncHTMLSession, url: str

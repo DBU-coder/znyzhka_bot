@@ -9,15 +9,24 @@ load_dotenv()
 
 @dataclass
 class DatabaseConfig:
-    database: str | None = getenv("SQLITE_DB")
-    database_system: str = "sqlite"
-    driver: str = "aiosqlite"
+    database_system: str = "postgresql"
+    driver: str = "asyncpg"
+
+    database: str | None = getenv("POSTGRES_DB")
+    user: str | None = getenv("POSTGRES_USER")
+    password: str | None = getenv("POSTGRES_PASSWORD")
+    host: str = getenv("POSTGRES_HOST", "localhost")
+    port: int = int(getenv("POSTGRES_PORT", "5432"))
 
     def build_connection_url(self) -> str:
         return URL.create(
             drivername=f"{self.database_system}+{self.driver}",
+            username=self.user,
             database=self.database,
-        ).render_as_string()
+            password=self.password,
+            port=self.port,
+            host=self.host,
+        ).render_as_string(hide_password=False)
 
 
 @dataclass

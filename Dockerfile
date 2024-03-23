@@ -6,9 +6,7 @@ WORKDIR /app
 
 COPY pyproject.toml poetry.lock ./
 
-RUN mkdir -p /app/sqlitedata \
-    && touch /app/sqlitedata/bot_database.db \
-    && poetry install --without dev --no-root
+RUN poetry install --without dev --no-root
 
 COPY src/ ./src
 

@@ -12,9 +12,9 @@ aiogram = "^3.4.1"
 requests-html = "^0.10.0"
 sqlalchemy = "^2.0.27"
 python-dotenv = "^1.0.1"
-aiosqlite = "^0.20.0"
 loguru = "^0.7.2"
 aiojobs = "^1.2.1"
+asyncpg = "^0.29.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.2.0"
