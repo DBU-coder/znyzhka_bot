@@ -1,13 +1,17 @@
-FROM python:3.11
-# don't create .pyc files
-ENV PYTHONDONTWRITEBYTECODE 1
-# don't docker buffering
-ENV PYTHONUNBUFFERED 1
-# set work directory
+FROM python:3.12-alpine AS builder
+
+RUN pip install poetry
+
 WORKDIR /app
 
-COPY requirements.txt .
+COPY pyproject.toml poetry.lock ./
 
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
+RUN mkdir -p /app/sqlitedata \
+    && touch /app/sqlitedata/bot_database.db \
+    && poetry install --without dev --no-root
+
+COPY src/ ./src
+
+RUN poetry install --without dev
+
+CMD ["poetry", "run", "python", "-m", "src.bot"]

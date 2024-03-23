@@ -31,7 +31,7 @@ def set_sqlite_pragma(dbapi_connection, _):
 def create_engine(url: URL | str) -> AsyncEngine:
     return create_async_engine(
         url=url,
-        echo=True,
+        echo=False,
     )
 
 
